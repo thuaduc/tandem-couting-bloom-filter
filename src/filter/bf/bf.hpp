@@ -20,9 +20,7 @@ class BloomFilter {
 };
 
 template <size_t T>
-BloomFilter<T>::BloomFilter() {
-    // Constructor implementation if needed
-}
+BloomFilter<T>::BloomFilter() = default;
 
 template <size_t T>
 size_t BloomFilter<T>::size() {

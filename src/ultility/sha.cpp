@@ -34,7 +34,7 @@ std::string sha256(const std::string& input) {
     return ss.str();
 }
 
-std::array<std::size_t, 5> createHashArray(const std::string& input) {
+std::array<std::size_t, NUM_OF_HASH> createHashArray(const std::string& input) {
     EVP_MD_CTX* mdctx = EVP_MD_CTX_new();
     const EVP_MD* md = EVP_sha256();
 
@@ -47,7 +47,7 @@ std::array<std::size_t, 5> createHashArray(const std::string& input) {
 
     EVP_MD_CTX_free(mdctx);
 
-    std::array<std::size_t, 5> output;
+    std::array<std::size_t, NUM_OF_HASH> output;
 
     for (int i = 0; i < NUM_OF_HASH; ++i) {
         std::size_t hashValue = 0;
