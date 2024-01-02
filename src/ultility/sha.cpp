@@ -1,7 +1,8 @@
 #include "sha.hpp"
 
-#include <openssl/sha.h>
+#include <openssl/evp.h>
 
+#include <array>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
@@ -12,37 +13,48 @@
 namespace SHA {
 
 std::string sha256(const std::string& input) {
-    unsigned char hash[SHA256_DIGEST_LENGTH];
-    SHA256_CTX sha256;
-    SHA256_Init(&sha256);
-    SHA256_Update(&sha256, input.c_str(), input.length());
-    SHA256_Final(hash, &sha256);
+    EVP_MD_CTX* mdctx = EVP_MD_CTX_new();
+    const EVP_MD* md = EVP_sha256();
+
+    EVP_DigestInit_ex(mdctx, md, nullptr);
+    EVP_DigestUpdate(mdctx, input.c_str(), input.length());
+
+    unsigned char hash[EVP_MAX_MD_SIZE];
+    unsigned int hash_len;
+    EVP_DigestFinal_ex(mdctx, hash, &hash_len);
+
+    EVP_MD_CTX_free(mdctx);
 
     std::stringstream ss;
-    for (int i = 0; i < SHA256_DIGEST_LENGTH; ++i) {
-        ss << std::hex << std::setw(2) << std::setfill('0') << (int)hash[i];
+    for (unsigned int i = 0; i < hash_len; ++i) {
+        ss << std::hex << std::setw(2) << std::setfill('0')
+           << static_cast<int>(hash[i]);
     }
 
     return ss.str();
 }
 
-std::array<std::string, 5> createHashArray(const std::string& input) {
-    unsigned char hash[SHA256_DIGEST_LENGTH];
-    SHA256_CTX sha256;
-    SHA256_Init(&sha256);
-    SHA256_Update(&sha256, input.c_str(), input.length());
-    SHA256_Final(hash, &sha256);
+std::array<std::size_t, 5> createHashArray(const std::string& input) {
+    EVP_MD_CTX* mdctx = EVP_MD_CTX_new();
+    const EVP_MD* md = EVP_sha256();
 
-    std::array<std::string, 5> output;
+    EVP_DigestInit_ex(mdctx, md, nullptr);
+    EVP_DigestUpdate(mdctx, input.c_str(), input.length());
 
-    std::stringstream ss;
+    unsigned char hash[EVP_MAX_MD_SIZE];
+    unsigned int hash_len;
+    EVP_DigestFinal_ex(mdctx, hash, &hash_len);
+
+    EVP_MD_CTX_free(mdctx);
+
+    std::array<std::size_t, 5> output;
+
     for (int i = 0; i < NUM_OF_HASH; ++i) {
-        ss.str(std::string());  // Clear the stringstream
+        std::size_t hashValue = 0;
         for (int j = 0; j < HASH_LENGTH; ++j) {
-            ss << std::hex << std::setw(2) << std::setfill('0')
-               << (int)hash[i * HASH_LENGTH + j];
+            hashValue = (hashValue << 8) | hash[i * HASH_LENGTH + j];
         }
-        output.at(i) = ss.str();
+        output.at(i) = hashValue;
     }
 
     return output;
