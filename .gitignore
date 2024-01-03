@@ -3,3 +3,5 @@
 test/doctest
 *.out
 src/build
+*.o
+*.a
