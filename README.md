@@ -11,5 +11,14 @@ This is a project from Thua-Duc Nguyen and Cong-Thanh Dang in pactical course da
 ## How to start
 
 ```
-make ...
+mkdir src/build
+cmake ..
+make
 ```
+
+## TODOs:
+
+- intergrate filter in btree
+- test if filter help improve look up, insert, scan, ...
+- 2nd hash function
+- implement cbf, vbf, tbf
