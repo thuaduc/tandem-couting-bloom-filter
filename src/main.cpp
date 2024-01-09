@@ -2,6 +2,7 @@
 
 #include "filter/bf/bf.hpp"
 #include "ultility/sha.hpp"
+#include <array>
 
 int main() {
     std::string input = "Hello, SHA-256!";
@@ -18,9 +19,9 @@ int main() {
         std::cout << hash << std::endl;
     }
 
-    constexpr size_t items = 1000000;
+    constexpr size_t items = 1e8;
     constexpr size_t filterSize = static_cast<size_t>(8.127152913 * items);
-    BloomFilter<filterSize> filter;
+    BloomFilter filter{filterSize};
 
     std::cout << filter.size() << std::endl;
     std::cout << filter.realSizeInMB() << std::endl;
