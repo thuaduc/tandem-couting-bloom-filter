@@ -1,13 +1,14 @@
+#include <array>
+#include <cstdint>
 #include <iostream>
 
 #include "filter/bf/bf.hpp"
 #include "filter/cbf/cbf.hpp"
-#include "ultility/sha.hpp"
-#include <array>
-#include <cstdint>
 #include "ultility/murmurHash.hpp"
+#include "ultility/sha.hpp"
 
 int main() {
+    // test SHA
     std::string input = "Hello, SHA-256!";
     std::string input2 = "Hello, SHA-259!";
 

@@ -1,9 +1,15 @@
+#include <cstdint>
 #include <iostream>
-#include <bitset>
+
+void printBits(uint8_t value) {
+    for (int i = 7; i >= 0; --i) {
+        uint8_t bit = (value & (1 << i)) ? 1 : 0;
+        printf("%hhu", bit);
+    }
+    std::cout << std::endl;
+}
 
 int main() {
-    std::cout << sizeof(bool) << std::endl;
-    std::<128> bitset;
-    std::cout << sizeof(bitset) << std::endl;
-
+    printBits(10);
+    return 0;
 }
