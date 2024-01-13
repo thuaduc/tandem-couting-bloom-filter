@@ -1,8 +1,11 @@
 #include <iostream>
 
 #include "filter/bf/bf.hpp"
+#include "filter/cbf/cbf.hpp"
 #include "ultility/sha.hpp"
 #include <array>
+#include <cstdint>
+#include "ultility/murmurHash.hpp"
 
 int main() {
     std::string input = "Hello, SHA-256!";
@@ -19,15 +22,22 @@ int main() {
         std::cout << hash << std::endl;
     }
 
-    constexpr size_t items = 1e8;
+    constexpr size_t items = 1e3;
     constexpr size_t filterSize = static_cast<size_t>(8.127152913 * items);
-    BloomFilter filter{filterSize};
+    BloomFilter bf{filterSize};
 
-    std::cout << filter.size() << std::endl;
-    std::cout << filter.realSizeInMB() << std::endl;
-    std::cout << filter.add(input) << std::endl;
-    std::cout << filter.search(input) << std::endl;
-    std::cout << filter.search(input2) << std::endl;
+    std::string_view v{"Test"};
+    bf.add(v);
+
+    CountingBloomFilter<long> cbf{filterSize};
+    std::cout << cbf.lookup(v) << std::endl;
+    cbf.add(v);
+    std::cout << cbf.lookup(v) << std::endl;
+
+    auto x = murmurHash64A_Array(3);
+    auto f1 = x[0];
+    auto f2 = x[1];
+    auto f3 = x[2];
 
     return 0;
 }

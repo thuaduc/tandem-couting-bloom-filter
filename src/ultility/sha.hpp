@@ -2,6 +2,6 @@
 #include <iostream>
 
 namespace SHA {
-std::string sha256(const std::string& input);
-std::array<std::size_t, 5> createHashArray(const std::string& input);
+std::string sha256(std::string_view input);
+std::array<std::size_t, 5> createHashArray(std::string_view input);
 };  // namespace SHA
