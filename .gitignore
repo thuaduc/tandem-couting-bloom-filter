@@ -5,5 +5,4 @@ test/doctest
 src/build
 *.o
 *.a
-perf.data
-main
+src/test
