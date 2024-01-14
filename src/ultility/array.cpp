@@ -131,21 +131,6 @@ bool Array::decrementCounter(size_t index, uint8_t num) {
     return true;
 }
 
-void Array::printBits(uint8_t value) {
-    for (int i = 7; i >= 0; --i) {
-        uint8_t bit = (value & (1 << i)) ? 1 : 0;
-        printf("%hhu", bit);
-    }
-}
-
-void Array::print() {
-    for (const auto& value : _vector) {
-        printBits(value);
-        printf(" ");
-    }
-    printf("\n");
-}
-
 size_t Array::size() { return _vector.size(); }
 
 }  // namespace user

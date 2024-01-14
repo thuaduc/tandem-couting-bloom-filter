@@ -9,7 +9,7 @@ namespace user {
 
 class Array {
    public:
-    Array(size_t size, size_t _bitsPerItem);
+    Array(size_t size, size_t bitsPerItem);
 
     size_t size();
 
