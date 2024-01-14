@@ -1,5 +1,5 @@
 #pragma once
 
-struct VBF {
+class VariableCoutingBloomFilter {
     /* data */
 };

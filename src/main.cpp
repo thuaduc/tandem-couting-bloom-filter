@@ -1,43 +1,34 @@
+#include <array>
+#include <cstdint>
 #include <iostream>
 
 #include "filter/bf/bf.hpp"
 #include "filter/cbf/cbf.hpp"
-#include "ultility/sha.hpp"
-#include <array>
-#include <cstdint>
 #include "ultility/murmurHash.hpp"
+#include "ultility/sha.hpp"
 
 int main() {
-    std::string input = "Hello, SHA-256!";
-    std::string input2 = "Hello, SHA-259!";
+    BloomFilter bf{16};
+    // should be 2
+    std::cout << bf.size() << std::endl;
 
-    std::string hash_result = SHA::sha256(input);
+    bf.add("item1");
+    bf.add("item2");
+    // should be true true false
+    std::cout << bf.lookup("item1") << " " << bf.lookup("item2") << " "
+              << bf.lookup("item3") << std::endl;
 
-    std::cout << "Input: " << input << std::endl;
-    std::cout << "SHA-256 Hash: " << hash_result << std::endl;
+    bf.print();
 
-    std::array<std::size_t, 5> result = SHA::createHashArray(input);
-
-    for (const auto& hash : result) {
-        std::cout << hash << std::endl;
+    CountingBloomFilter cbf{1024};
+    // should be 8
+    std::cout << cbf.size() << std::endl;
+    for (size_t i = 0; i < 1023; i++) {
+        cbf.add("item" + std::to_string(i));
     }
 
-    constexpr size_t items = 1e3;
-    constexpr size_t filterSize = static_cast<size_t>(8.127152913 * items);
-    BloomFilter bf{filterSize};
+    std::cout << cbf.lookup("item1") << " " << cbf.lookup("item2") << " "
+              << cbf.lookup("item3") << std::endl;
 
-    std::string_view v{"Test"};
-    bf.add(v);
-
-    CountingBloomFilter<long> cbf{filterSize};
-    std::cout << cbf.lookup(v) << std::endl;
-    cbf.add(v);
-    std::cout << cbf.lookup(v) << std::endl;
-
-    auto x = murmurHash64A_Array(3);
-    auto f1 = x[0];
-    auto f2 = x[1];
-    auto f3 = x[2];
-
-    return 0;
+    cbf.print();
 }
