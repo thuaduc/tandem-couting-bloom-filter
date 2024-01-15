@@ -1,7 +1,7 @@
 #include "cbf.hpp"
 
-CountingBloomFilter::CountingBloomFilter(size_t size) : BloomFilter(size) {
-    _filter.assign(((size * 4) + 7) / 8, 0);
+CountingBloomFilter::CountingBloomFilter(size_t size) : BloomFilter(size * 8) {
+    _filter.assign(size * 4, 0);
 }
 
 bool CountingBloomFilter::add(std::string_view item) {

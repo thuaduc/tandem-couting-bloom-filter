@@ -9,7 +9,6 @@
 #include <memory>
 #include <vector>
 
-#include "../../ultility/array.hpp"
 #include "../../ultility/help.hpp"
 #include "../../ultility/murmurHash.hpp"
 #include "../../ultility/sha.hpp"
