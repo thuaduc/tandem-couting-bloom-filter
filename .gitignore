@@ -6,3 +6,4 @@ src/build
 *.o
 *.a
 src/test
+test/doctest

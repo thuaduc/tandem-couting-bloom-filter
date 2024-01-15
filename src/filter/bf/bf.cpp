@@ -1,8 +1,8 @@
 #include "bf.hpp"
 
-BloomFilter::BloomFilter(size_t size) : _size{size} {
+BloomFilter::BloomFilter(size_t size) : _size{size * 8} {
     hashFunctions = murmurHash64A_Array(nHashFunctions);
-    _filter.assign((size + 7) / 8, 0);
+    _filter.assign(size, 0);
 }
 
 size_t BloomFilter::size() { return _filter.size(); }
