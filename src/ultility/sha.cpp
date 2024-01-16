@@ -2,14 +2,6 @@
 
 #include <openssl/evp.h>
 
-#include <array>
-#include <iomanip>
-#include <iostream>
-#include <sstream>
-
-#define NUM_OF_HASH 5
-#define HASH_LENGTH 6
-
 namespace SHA {
 
 std::string sha256(std::string_view input) {
@@ -17,7 +9,8 @@ std::string sha256(std::string_view input) {
     const EVP_MD* md = EVP_sha256();
 
     EVP_DigestInit_ex(mdctx, md, nullptr);
-    EVP_DigestUpdate(mdctx, static_cast<std::string>(input).c_str(), input.length());
+    EVP_DigestUpdate(mdctx, static_cast<std::string>(input).c_str(),
+                     input.length());
 
     unsigned char hash[EVP_MAX_MD_SIZE];
     unsigned int hash_len;
@@ -34,12 +27,13 @@ std::string sha256(std::string_view input) {
     return ss.str();
 }
 
-std::array<std::size_t, NUM_OF_HASH> createHashArray(std::string_view input) {
+std::array<std::size_t, 5> createHashArray(std::string_view input) {
     EVP_MD_CTX* mdctx = EVP_MD_CTX_new();
     const EVP_MD* md = EVP_sha256();
 
     EVP_DigestInit_ex(mdctx, md, nullptr);
-    EVP_DigestUpdate(mdctx, static_cast<std::string>(input).c_str(), input.length());
+    EVP_DigestUpdate(mdctx, static_cast<std::string>(input).c_str(),
+                     input.length());
 
     unsigned char hash[EVP_MAX_MD_SIZE];
     unsigned int hash_len;

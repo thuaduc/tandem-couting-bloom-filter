@@ -5,129 +5,59 @@
 #include "../src/filter/vbf/vbf.hpp"
 #include "doctest/doctest/doctest.h"
 
-TEST_CASE("Test basic insert, remove, lookup - standart bloom filter") {
-    size_t size = 1000000;
-    std::string someRandomText = "Some random text";
-    BloomFilter bf{size};
+size_t size = 1000000;
+size_t size2 = 100000;
+std::string someRandomText = "This is a random text";
+
+void runTest(BloomFilter& bf) {
     size_t falsePositiveCount = 0;
 
-    for (size_t i = 0; i < size; i += 2) {
+    for (size_t i = 0; i < size; ++i) {
         bf.add(someRandomText + std::to_string(i));
     }
 
-    for (size_t i = 0; i < size; i++) {
-        if (i % 2 == 0) {
-            CHECK_EQ(bf.lookup(someRandomText + std::to_string(i)), true);
-        } else {
-            if (bf.lookup(someRandomText + std::to_string(i))) {
-                falsePositiveCount++;
-            }
+    for (size_t i = 0; i < size; ++i) {
+        CHECK_EQ(bf.lookup(someRandomText + std::to_string(i)), true);
+    }
+
+    for (size_t i = size; i < size + size2; ++i) {
+        if (bf.lookup(someRandomText + std::to_string(i))) {
+            ++falsePositiveCount;
         }
     }
 
-    printf("\nFalse Positive Rate: %f\n\n",
+    std::string typeOfFilter = "";
+
+    if (typeid(bf) == typeid(CountingBloomFilter)) {
+        typeOfFilter = "Counting Bloomfilter";
+    } else if (typeid(bf) == typeid(VariableCoutingBloomFilter)) {
+        typeOfFilter = "Variable Conting Bloomfilter";
+    } else if (typeid(bf) == typeid(TandemBloomFilter)) {
+        typeOfFilter = "Tandem Bloomfilter";
+    } else {
+        typeOfFilter = "Bloomfilter";
+    }
+
+    printf("\nFalse Positive Rate %s: %f\n\n", typeOfFilter.c_str(),
            static_cast<float>(falsePositiveCount) / size);
+}
+
+TEST_CASE("Test basic insert, remove, lookup - standart bloom filter") {
+    BloomFilter bf{size};
+    runTest(bf);
 }
 
 TEST_CASE("Test basic insert, remove, lookup - couting bloom filter") {
-    size_t size = 1000000;
-    std::string someRandomText = "Some random text";
-    CountingBloomFilter cbf{size};
-    size_t falsePositiveCount = 0;
-
-    for (size_t i = 0; i < size; i += 2) {
-        cbf.add(someRandomText + std::to_string(i));
-    }
-
-    for (size_t i = 0; i < size; i++) {
-        if (i % 2 == 0) {
-            CHECK_EQ(cbf.lookup(someRandomText + std::to_string(i)), true);
-        } else {
-            if (cbf.lookup(someRandomText + std::to_string(i))) {
-                falsePositiveCount++;
-            }
-        }
-    }
-
-    for (size_t i = 0; i < size; i += 2) {
-        if (i % 2 == 0) {
-            CHECK_EQ(cbf.remove(someRandomText + std::to_string(i)), true);
-        }
-    }
-
-    for (size_t i = 0; i < size; i += 2) {
-        CHECK_EQ(cbf.lookup(someRandomText + std::to_string(i)), false);
-    }
-
-    printf("\nFalse Positive Rate: %f\n\n",
-           static_cast<float>(falsePositiveCount) / size);
+    CountingBloomFilter bf{size};
+    runTest(bf);
 }
 
-TEST_CASE(
-    "Test basic insert, remove, lookup - variable increment bloom filter") {
-    size_t size = 1000000;
-    std::string someRandomText = "Some random text";
-    VariableCoutingBloomFilter vbf{size};
-    size_t falsePositiveCount = 0;
-
-    for (size_t i = 0; i < size; i += 2) {
-        vbf.add(someRandomText + std::to_string(i));
-    }
-
-    for (size_t i = 0; i < size; i++) {
-        if (i % 2 == 0) {
-            CHECK_EQ(vbf.lookup(someRandomText + std::to_string(i)), true);
-        } else {
-            if (vbf.lookup(someRandomText + std::to_string(i))) {
-                falsePositiveCount++;
-            }
-        }
-    }
-
-    for (size_t i = 0; i < size; i += 2) {
-        if (i % 2 == 0) {
-            CHECK_EQ(vbf.remove(someRandomText + std::to_string(i)), true);
-        }
-    }
-
-    for (size_t i = 0; i < size; i += 2) {
-        CHECK_EQ(vbf.lookup(someRandomText + std::to_string(i)), false);
-    }
-
-    printf("\nFalse Positive Rate: %f\n\n",
-           static_cast<float>(falsePositiveCount) / size);
+TEST_CASE("Test basic insert, remove, lookup - variable couting bloom filter") {
+    VariableCoutingBloomFilter bf{size};
+    runTest(bf);
 }
 
-// TEST_CASE("Test basic insert, remove, lookup - tandem bloom filter") {
-//     size_t size = 1000000;
-//     std::string someRandomText = "Some random text";
-//     TandemBloomFilter tbf{size};
-//     size_t falsePositiveCount = 0;
-
-//     for (size_t i = 0; i < size; i += 2) {
-//         tbf.add(someRandomText + std::to_string(i));
-//     }
-
-//     for (size_t i = 0; i < size; i++) {
-//         if (i % 2 == 0) {
-//             CHECK_EQ(tbf.lookup(someRandomText + std::to_string(i)), true);
-//         } else {
-//             if (tbf.lookup(someRandomText + std::to_string(i))) {
-//                 falsePositiveCount++;
-//             }
-//         }
-//     }
-
-//     for (size_t i = 0; i < size; i += 2) {
-//         if (i % 2 == 0) {
-//             CHECK_EQ(tbf.remove(someRandomText + std::to_string(i)), true);
-//         }
-//     }
-
-//     for (size_t i = 0; i < size; i += 2) {
-//         CHECK_EQ(tbf.lookup(someRandomText + std::to_string(i)), false);
-//     }
-
-//     printf("\nFalse Positive Rate: %f\n\n",
-//            static_cast<float>(falsePositiveCount) / size);
-// }
+TEST_CASE("Test basic insert, remove, lookup - tandem couting bloom filter") {
+    TandemBloomFilter bf{size};
+    runTest(bf);
+}
