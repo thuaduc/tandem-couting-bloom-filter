@@ -35,7 +35,7 @@ bool VariableCoutingBloomFilter::decreaseCounter(size_t index, uint8_t num) {
 std::pair<size_t, uint8_t>
 VariableCoutingBloomFilter::calculatePositionAndHashValue(size_t hash) {
     auto pos = hash % _filter.size();
-    auto value = 9 + (pos % 8);
+    uint8_t value = 9 + (pos % 8);
     return std::make_pair(pos, value);
 }
 
@@ -52,8 +52,8 @@ bool VariableCoutingBloomFilter::lookup(std::string_view item) {
     for (size_t i = 0; i < nHashFunctions; ++i) {
         auto [pos, hash] =
             calculatePositionAndHashValue(hashFunctions[i](item));
-        if (_filter.at(pos) == hash) {
-            continue;
+        if (_filter.at(pos) != hash) {
+            return false;
         }
         if (_filter.at(pos) > 16 && _filter.at(pos) <= 32 &&
             _filter.at(pos) - hash < 8) {
