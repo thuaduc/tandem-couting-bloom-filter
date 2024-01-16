@@ -10,27 +10,34 @@
 #include "ultility/sha.hpp"
 
 int main() {
-    size_t size = 1000;
+    size_t size = 7;
     std::string someRandomText = "Some random text";
 
-    BloomFilter bf{size};
-    bf.add(someRandomText);
-    bf.lookup(someRandomText);
-    std::cout << bf.size() << std::endl;
+    // BloomFilter bf{size};
+    // bf.add(someRandomText);
+    // bf.lookup(someRandomText);
+    // std::cout << bf.size() << std::endl;
 
-    CountingBloomFilter cbf{size};
-    std::cout << cbf.size() << std::endl;
-    cbf.add(someRandomText);
-    cbf.lookup(someRandomText);
-    cbf.remove(someRandomText);
+    // CountingBloomFilter cbf{size};
+    // std::cout << cbf.size() << std::endl;
+    // cbf.add(someRandomText);
+    // cbf.lookup(someRandomText);
+    // cbf.remove(someRandomText);
 
-    VariableCoutingBloomFilter vbf{size};
-    vbf.add(someRandomText);
-    vbf.lookup(someRandomText);
-    vbf.remove(someRandomText);
+    // VariableCoutingBloomFilter vbf{size};
+    // std::cout << vbf.size() << std::endl;
+    // vbf.add(someRandomText);
+    // vbf.lookup(someRandomText);
+    // vbf.remove(someRandomText);
 
     TandemBloomFilter tbf{size};
-    tbf.add(someRandomText);
-    tbf.lookup(someRandomText);
-    tbf.remove(someRandomText);
+    for (size_t i = 0; i < size; ++i) {
+        tbf.add(someRandomText + std::to_string(i));
+    }
+    tbf.printFilter();
+
+    for (size_t i = 0; i < size; ++i) {
+        std::cout << tbf.lookup(someRandomText + std::to_string(i)) << " ";
+    }
+    std::cout << std::endl;
 }

@@ -1,6 +1,6 @@
 #include "cbf.hpp"
 
-CountingBloomFilter::CountingBloomFilter(size_t size) : BloomFilter(size * 8) {
+CountingBloomFilter::CountingBloomFilter(size_t size) : BloomFilter(size) {
     _filter.assign(size * 4, 0);
 }
 

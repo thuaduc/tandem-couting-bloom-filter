@@ -9,7 +9,8 @@ class TandemBloomFilter : public VariableCoutingBloomFilter {
     virtual bool remove(std::string_view item) override;
 
    private:
-    std::tuple<size_t, size_t, uint8_t, uint8_t> calculatePositionAndHashes(
-        size_t i, std::string_view item);
-    bool increaseCounterNeighbour(size_t index, uint8_t num);
+    std::unique_ptr<std::function<uint64_t(std::string_view)>[]>
+        thirdHashFunction;
+    std::tuple<size_t, size_t, uint8_t, uint8_t>
+    calculatePositionAndIncrementer(size_t i, std::string_view item);
 };

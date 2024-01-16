@@ -10,6 +10,7 @@ class VariableCoutingBloomFilter : public BloomFilter {
     virtual bool remove(std::string_view item);
     virtual void increaseCounter(size_t index, uint8_t num);
     virtual bool decreaseCounter(size_t index, uint8_t num);
+    void printFilter();
 
    protected:
     std::unique_ptr<std::function<uint64_t(std::string_view)>[]>

@@ -5,7 +5,7 @@ find_package(OpenSSL REQUIRED)
 
 set(CMAKE_CXX_COMPILER "clang++")
 set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -Wextra")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O3 -Wall -Wextra")
 
 set(SOURCES ultility/murmurHash.cpp ultility/help.cpp filter/bf/bf.cpp filter/cbf/cbf.cpp filter/vbf/vbf.cpp filter/tbf/tbf.cpp)
 

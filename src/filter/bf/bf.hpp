@@ -13,8 +13,7 @@
 #include "../../ultility/murmurHash.hpp"
 #include "../../ultility/sha.hpp"
 
-// #define ERRORRATE 0.02
-#define nHashFunctions 5
+#define nHashFunctions 4
 #define u8size 8
 
 class BloomFilter {
