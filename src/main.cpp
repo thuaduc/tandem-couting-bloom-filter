@@ -10,14 +10,16 @@
 #include "ultility/sha.hpp"
 
 int main() {
-    size_t size = 1000000;
+    size_t size = 1000;
     std::string someRandomText = "Some random text";
 
     BloomFilter bf{size};
     bf.add(someRandomText);
     bf.lookup(someRandomText);
+    std::cout << bf.size() << std::endl;
 
     CountingBloomFilter cbf{size};
+    std::cout << cbf.size() << std::endl;
     cbf.add(someRandomText);
     cbf.lookup(someRandomText);
     cbf.remove(someRandomText);
