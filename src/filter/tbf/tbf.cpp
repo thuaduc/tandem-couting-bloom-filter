@@ -33,9 +33,11 @@ bool TandemBloomFilter::add(std::string_view item) {
         } else if (counter1 < 2 * Range) {
             counter1 += incrementer;
             if (counter2 < Range) {
-                if (incrementer <= 2 * Range - 2) {
+                // if (incrementer <= 2 * Range - 2) {
+                if (incrementer <= 14) {
                     counter2 = incrementer + 1 - Range;
-                } else if (counter1 <= 2 * Range - 2) {
+                    //} else if (counter1 <= 2 * Range - 2) {
+                } else if (counter1 <= 14) {
                     counter2 = counter1 - Range + 1;
                 } else {
                     counter2 = 1;
@@ -63,10 +65,11 @@ bool TandemBloomFilter::lookup(std::string_view item) {
             return false;
         }
 
-        if (counter1 < 2 * Range) {
+        // if (counter1 < 2 * Range) {
+        if (counter1 < 16) {
             if (counter1 != incrementer) {
                 return false;
-            } else if (counter2 >= 1 && counter2 < Range &&
+            } else if ((counter2 >= 1 && counter2 < Range) &&
                        counter2 != incrementerNeighbour) {
                 return false;
             }
@@ -76,7 +79,7 @@ bool TandemBloomFilter::lookup(std::string_view item) {
                     (2 * Range - 1) != incrementer) {
                     return false;
                 } else if (counter2 + Range - 1 != incrementer &&
-                           counter1 - counter2 - Range + 1 != incrementer) {
+                           counter1 + 1 != counter2 + Range + incrementer) {
                     return false;
                 }
             }

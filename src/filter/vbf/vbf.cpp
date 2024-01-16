@@ -45,7 +45,7 @@ VariableCoutingBloomFilter::calculatePositionAndHashValue(
     size_t i, std::string_view item) {
     auto hash = hashFunctions[i](item);
     auto pos = hash % _filter.size();
-    uint8_t value = 8 + (hash % 9);
+    uint8_t value = Range + (secondHashFunction[i](item) % (Range + 1));
 
     return std::make_pair(pos, value);
 }
