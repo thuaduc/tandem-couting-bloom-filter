@@ -1,12 +1,12 @@
 #include "cbf.hpp"
 
-CountingBloomFilter::CountingBloomFilter(size_t size) : BloomFilter(size * 8) {
+CountingBloomFilter::CountingBloomFilter(size_t size) : BloomFilter(size) {
     _filter.assign(size * 4, 0);
 }
 
 bool CountingBloomFilter::add(std::string_view item) {
     for (size_t i = 0; i < nHashFunctions; ++i) {
-        auto pos = hashFunctions[i](item) % this->_size;
+        size_t pos = hashFunctions[i](item) % this->_size;
         incrementCounterByOne(pos);
     }
     return true;
@@ -36,7 +36,7 @@ bool CountingBloomFilter::lookup(std::string_view item) {
 
 void CountingBloomFilter::checkIndexValid(size_t pos) {
     if (pos >= _filter.size()) {
-        std::cerr << "Filter out of range" << std::endl;
+        printf("pos: %zu size: %zu\n", pos, _filter.size());
         exit(0);
     }
 }

@@ -18,10 +18,12 @@ make
 
 ## Compile test
 
-Make sure that you run first step before this
+Make sure that you have doctest installed in test folder.
 
-```
-clang++ -std=c++20 -o test -Wall -Wextra -Wl,-rpath "./build" -I include/doctest test.cpp -L ../src/build -lfilter
+```bash
+# in test folder
+chmod +x test.sh;
+./test.sh
 ```
 
 ## TODOs:
