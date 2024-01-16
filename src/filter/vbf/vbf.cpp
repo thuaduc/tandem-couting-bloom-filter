@@ -3,6 +3,7 @@
 VariableCoutingBloomFilter::VariableCoutingBloomFilter(size_t size)
     : BloomFilter(size) {
     _filter.assign(size * 8, 0);
+    secondHashFunction = murmurHash64A_Array(1);
 }
 
 void VariableCoutingBloomFilter::increaseCounter(size_t index, uint8_t num) {
@@ -33,30 +34,29 @@ bool VariableCoutingBloomFilter::decreaseCounter(size_t index, uint8_t num) {
 }
 
 std::pair<size_t, uint8_t>
-VariableCoutingBloomFilter::calculatePositionAndHashValue(size_t hash) {
+VariableCoutingBloomFilter::calculatePositionAndHashValue(
+    size_t i, std::string_view item) {
+    auto hash = hashFunctions[i](item);
     auto pos = hash % _filter.size();
-    uint8_t value = 9 + (pos % 8);
+    uint8_t value = 8 + (hash % 9);
+
     return std::make_pair(pos, value);
 }
 
 bool VariableCoutingBloomFilter::add(std::string_view item) {
     for (size_t i = 0; i < nHashFunctions; ++i) {
-        auto [pos, hash] =
-            calculatePositionAndHashValue(hashFunctions[i](item));
-        increaseCounter(pos, hash);
+        auto [pos, incrementer] = calculatePositionAndHashValue(i, item);
+        increaseCounter(pos, incrementer);
     }
     return true;
 }
 
 bool VariableCoutingBloomFilter::lookup(std::string_view item) {
     for (size_t i = 0; i < nHashFunctions; ++i) {
-        auto [pos, hash] =
-            calculatePositionAndHashValue(hashFunctions[i](item));
-        if (_filter.at(pos) != hash) {
-            return false;
-        }
-        if (_filter.at(pos) > 16 && _filter.at(pos) <= 32 &&
-            _filter.at(pos) - hash < 8) {
+        auto [pos, incrementer] = calculatePositionAndHashValue(i, item);
+        if (_filter.at(pos) < incrementer ||
+            (_filter.at(pos) - incrementer >= 1 &&
+             _filter.at(pos) - incrementer < Range)) {
             return false;
         }
     }
@@ -65,18 +65,11 @@ bool VariableCoutingBloomFilter::lookup(std::string_view item) {
 
 bool VariableCoutingBloomFilter::remove(std::string_view item) {
     for (size_t i = 0; i < nHashFunctions; ++i) {
-        auto [pos, hash] =
-            calculatePositionAndHashValue(hashFunctions[i](item));
-        if (_filter.at(pos) == hash) {
-            _filter.at(pos) = 0;
-            continue;
-        }
-        if (_filter.at(pos) > 16 && _filter.at(pos) <= 32) {
-            if (_filter.at(pos) - hash < 8) {
-                return false;
-            } else {
-                _filter.at(pos) -= hash;
-            }
+        auto [pos, incrementer] = calculatePositionAndHashValue(i, item);
+        if (_filter.at(pos) >= incrementer) {
+            _filter.at(pos) -= incrementer;
+        } else {
+            return false;
         }
     }
     return true;

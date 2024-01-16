@@ -10,6 +10,6 @@ class TandemBloomFilter : public VariableCoutingBloomFilter {
 
    private:
     std::tuple<size_t, size_t, uint8_t, uint8_t> calculatePositionAndHashes(
-        size_t hash);
+        size_t i, std::string_view item);
     bool increaseCounterNeighbour(size_t index, uint8_t num);
 };
