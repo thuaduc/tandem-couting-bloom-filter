@@ -1,6 +1,6 @@
 #pragma once
 #include "../bf/bf.hpp"
-#define L  // value increased in range L - 2L
+#define Range 8  // value increased in range L - 2L
 
 class VariableCoutingBloomFilter : public BloomFilter {
    public:

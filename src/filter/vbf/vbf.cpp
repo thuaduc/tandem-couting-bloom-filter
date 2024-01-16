@@ -35,7 +35,7 @@ bool VariableCoutingBloomFilter::decreaseCounter(size_t index, uint8_t num) {
 std::pair<size_t, uint8_t>
 VariableCoutingBloomFilter::calculatePositionAndHashValue(size_t hash) {
     auto pos = hash % _filter.size();
-    uint8_t value = 9 + (pos % 8);
+    uint8_t value = Range + (pos % (Range + 1));
     return std::make_pair(pos, value);
 }
 
@@ -52,11 +52,8 @@ bool VariableCoutingBloomFilter::lookup(std::string_view item) {
     for (size_t i = 0; i < nHashFunctions; ++i) {
         auto [pos, hash] =
             calculatePositionAndHashValue(hashFunctions[i](item));
-        if (_filter.at(pos) != hash) {
-            return false;
-        }
-        if (_filter.at(pos) > 16 && _filter.at(pos) <= 32 &&
-            _filter.at(pos) - hash < 8) {
+        if (_filter.at(pos) < hash ||
+            (_filter.at(pos) - hash >= 1 && _filter.at(pos) - hash < Range)) {
             return false;
         }
     }
@@ -67,16 +64,10 @@ bool VariableCoutingBloomFilter::remove(std::string_view item) {
     for (size_t i = 0; i < nHashFunctions; ++i) {
         auto [pos, hash] =
             calculatePositionAndHashValue(hashFunctions[i](item));
-        if (_filter.at(pos) == hash) {
-            _filter.at(pos) = 0;
-            continue;
-        }
-        if (_filter.at(pos) > 16 && _filter.at(pos) <= 32) {
-            if (_filter.at(pos) - hash < 8) {
-                return false;
-            } else {
-                _filter.at(pos) -= hash;
-            }
+        if (_filter.at(pos) >= hash) {
+            _filter.at(pos) -= hash;
+        } else {
+            return false;
         }
     }
     return true;
