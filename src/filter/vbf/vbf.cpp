@@ -3,7 +3,14 @@
 VariableCoutingBloomFilter::VariableCoutingBloomFilter(size_t size)
     : BloomFilter(size) {
     _filter.assign(size * 8, 0);
-    secondHashFunction = murmurHash64A_Array(1);
+    secondHashFunction = murmurHash64A_Array(nHashFunctions);
+}
+
+void VariableCoutingBloomFilter::printFilter() {
+    for (auto const ele : _filter) {
+        printf("%d ", ele);
+    }
+    std::cout << std::endl;
 }
 
 void VariableCoutingBloomFilter::increaseCounter(size_t index, uint8_t num) {
