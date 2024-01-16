@@ -1,11 +1,11 @@
 #include "bf.hpp"
 
-BloomFilter::BloomFilter(size_t size) : _size{size * 8} {
+BloomFilter::BloomFilter(size_t size) : _size{size} {
     hashFunctions = murmurHash64A_Array(nHashFunctions);
     _filter.assign(size, 0);
 }
 
-size_t BloomFilter::size() { return _filter.size(); }
+size_t BloomFilter::size() { return _size; }
 
 bool BloomFilter::add(std::string_view item) {
     for (size_t i = 0; i < nHashFunctions; ++i) {
