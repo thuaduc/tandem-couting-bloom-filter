@@ -38,7 +38,7 @@ bool CountingBloomFilter::remove(uint8_t *key, uint16_t keyLength){
     uint8_t lsNibble;
 
     // increment low part of uint8
-    if (index & 1 == 0) {
+    if ((index & 1) == 0) {
         lsNibble = filter.at(pos) & LS_NIBBLE_MASK;
         if (lsNibble == 15) {
             std::cerr << "Counter overflow by couting bloom filter" << std::endl;
@@ -65,7 +65,7 @@ void CountingBloomFilter::decrementNibble(size_t index){
     uint8_t lsNibble;
 
     // decrement low part of uint8
-    if (index & 1 == 0) {
+    if ((index & 1) == 0) {
         lsNibble = filter.at(pos) & LS_NIBBLE_MASK;
         if (lsNibble == 0) {
             std::cerr << "Counter underflow by couting bloom filter" << std::endl;
@@ -88,5 +88,5 @@ void CountingBloomFilter::decrementNibble(size_t index){
 
 uint8_t CountingBloomFilter::getNibble(size_t index){
     size_t pos = index / 2;
-    return index & 1 == 0 ? filter.at(pos) & LS_NIBBLE_MASK : (filter.at(pos) & MS_NIBBLE_MASK) >> 4;
+    return (index & 1) == 0 ? filter.at(pos) & LS_NIBBLE_MASK : (filter.at(pos) & MS_NIBBLE_MASK) >> 4;
 }

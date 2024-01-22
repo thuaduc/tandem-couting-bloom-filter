@@ -11,7 +11,7 @@ TandemBloomFilter::TandemBloomFilter(size_t size, uint8_t nHashFunctions, uint8_
 
 void TandemBloomFilter::add(uint8_t *key, uint16_t keyLength){
     for (size_t i = 0; i < f_set.size(); ++i) {
-        auto [index, c1, c2] = getTandemValues(i, key, keyLength);
+        auto [index, c1, c2] = getTBFvalues(i, key, keyLength);
         uint8_t& initC1 = filter.at(index);
         uint8_t& initC2 = filter.at(getAdjecentIndex(index));
 
@@ -47,7 +47,7 @@ void TandemBloomFilter::add(uint8_t *key, uint16_t keyLength){
 
 bool TandemBloomFilter::lookup(uint8_t *key, uint16_t keyLength){
     for (size_t i = 0; i < f_set.size(); ++i) {
-        auto [index, c1, c2] = getTandemValues(i, key, keyLength);
+        auto [index, c1, c2] = getTBFvalues(i, key, keyLength);
         uint8_t initC1 = filter.at(index);
         uint8_t initC2 = filter.at(getAdjecentIndex(index));
         if(initC1 < c1 || (1 <= (initC1 - c1) && (initC1 - c1) < L_set)){
@@ -80,7 +80,7 @@ bool TandemBloomFilter::lookup(uint8_t *key, uint16_t keyLength){
 
 bool TandemBloomFilter::remove(uint8_t *key, uint16_t keyLength){
     for (size_t i = 0; i < f_set.size(); ++i) {
-        auto [index, c1, c2] = getTandemValues(i, key, keyLength);
+        auto [index, c1, c2] = getTBFvalues(i, key, keyLength);
         uint8_t& initC1 = filter.at(index);
         uint8_t& initC2 = filter.at(getAdjecentIndex(index));
         if(L_set <= initC1 && initC1 < 2*L_set){
@@ -99,11 +99,11 @@ uint8_t TandemBloomFilter::getAdjecentIndex(size_t index){
     return (index & 1) == 0 ? index + 1 : index - 1; 
 }
 
-std::tuple<size_t, uint8_t, uint8_t> TandemBloomFilter::getTandemValues(uint8_t i, uint8_t *key, uint16_t keyLength){
+std::tuple<size_t, uint8_t, uint8_t> TandemBloomFilter::getTBFvalues(uint8_t i, uint8_t *key, uint16_t keyLength){
     return std::make_tuple(
     f_set.at(i)(key, keyLength) % filter.size(),
-    (g_set.at(i)(key, keyLength) % (L_set + 1)) + L_set, //[L - 2L-1]
-    (h_set.at(i)(key, keyLength) % (L_set - 1)) + 1); //[1 - L-1]
+    (g_set.at(i)(key, keyLength) % (L_set + 1)) + L_set, //[L-set - 2*L_set-1]
+    (h_set.at(i)(key, keyLength) % (L_set - 1)) + 1); //[1 - L_set-1]
 }
 
 void TandemBloomFilter::increment(uint8_t& toInc, uint8_t varIncrement){

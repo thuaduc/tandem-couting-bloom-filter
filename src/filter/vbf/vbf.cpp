@@ -10,21 +10,15 @@ VariableCoutingBloomFilter::VariableCoutingBloomFilter(size_t size, uint8_t nHas
 
 void VariableCoutingBloomFilter::add(uint8_t *key, uint16_t keyLength){
     for (size_t i = 0; i < f_set.size(); ++i) {
-        uint64_t index = f_set.at(i)(key, keyLength) % filter.size();
-        uint64_t varIncrement = (g_set.at(i)(key, keyLength) % (L_set + 1)) + L_set;
+        auto [index, varIncrement] = getVBFvalues(i, key, keyLength);
         increment(index, varIncrement);
     }
 }
 bool VariableCoutingBloomFilter::lookup(uint8_t *key, uint16_t keyLength){
     for (size_t i = 0; i < f_set.size(); ++i) {
-        uint64_t index = f_set.at(i)(key, keyLength) % filter.size();
-        uint8_t varIncrement = (g_set.at(i)(key, keyLength) % (L_set + 1)) + L_set;
+        auto [index, varIncrement] = getVBFvalues(i, key, keyLength);
         int diff = filter.at(index) - varIncrement;
-        if(diff < 0){
-            return false;
-        }
-        else if(diff != 0 || diff < L_set){
-            std::cout << "unmöglich" << std::endl;
+        if(diff < 0 || (1 <= diff && diff < L_set)){
             return false;
         }
     }
@@ -36,8 +30,7 @@ bool VariableCoutingBloomFilter::remove(uint8_t *key, uint16_t keyLength){
     }
 
     for (size_t i = 0; i < f_set.size(); ++i) {
-        uint64_t index = f_set.at(i)(key, keyLength) % filter.size();
-        uint64_t varIncrement = (g_set.at(i)(key, keyLength) % (L_set + 1)) + L_set;
+        auto [index, varIncrement] = getVBFvalues(i, key, keyLength);
         decrement(index, varIncrement);
     }
     return true;
@@ -56,4 +49,11 @@ void VariableCoutingBloomFilter::decrement(size_t index, uint8_t varIncrement){
         return;
     }
     filter.at(index) -= varIncrement;
+}
+
+std::pair<size_t, uint8_t> VariableCoutingBloomFilter::getVBFvalues(size_t i, uint8_t *key, uint16_t keyLength){
+    return std::make_pair(
+        f_set.at(i)(key, keyLength) % filter.size(), //[L-set - 2*L_set-1]
+        (g_set.at(i)(key, keyLength) % (L_set + 1)) + L_set
+    );
 }
