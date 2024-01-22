@@ -2,8 +2,8 @@
 
 
 TandemBloomFilter::TandemBloomFilter(size_t size, uint8_t nHashFunctions, uint8_t L_set): filter(size), f_set{nHashFunctions}, g_set{nHashFunctions}, h_set{nHashFunctions}{
-    if(!(2 <= L_set && (L_set & (L_set - 1)) == 0)){
-        std::cerr << "L ≥ 2 should be a positive integer of the form L = 2^i" << std::endl;
+    if(!(2 <= L_set && (L_set & (L_set - 1)) == 0) && 64 < L_set){
+        std::cerr << "L ≥ 2 should be a positive integer of the form L = 2^i and for our implementation L_set <= 64" << std::endl;
         exit(0);
     }
     this->L_set = L_set;
@@ -22,10 +22,11 @@ void TandemBloomFilter::add(uint8_t *key, uint16_t keyLength){
             }
         }
         else if (c1 < 2*L_set){
-            initC1 += c1;
+            increment(initC1, c1);
             if(initC2 < L_set){
                 if(c1 - L_set + 1 < L_set){
                     initC2 = c1 - L_set + 1;
+                    
                 }
                 else if(initC1 - L_set + 1 < L_set){
                     initC2 = initC1 - L_set + 1;
@@ -36,7 +37,7 @@ void TandemBloomFilter::add(uint8_t *key, uint16_t keyLength){
             }
         }
         else{
-            initC1 += c1;
+            increment(initC1, c1);
             if(1 <= initC2 && initC2 < L_set){
                 initC2 = 0;
             }
@@ -72,7 +73,6 @@ bool TandemBloomFilter::lookup(uint8_t *key, uint16_t keyLength){
                 }
             }
         }
-
     }
 
     return true;
@@ -87,7 +87,7 @@ bool TandemBloomFilter::remove(uint8_t *key, uint16_t keyLength){
             initC1 = 0;
         }
         else{
-            initC1 -= c1;
+            decrement(initC1, c1);
         }
         if(1 <= initC2 && initC2 < L_set){
             initC2 = 0;
@@ -96,7 +96,7 @@ bool TandemBloomFilter::remove(uint8_t *key, uint16_t keyLength){
 }
 
 uint8_t TandemBloomFilter::getAdjecentIndex(size_t index){
-    return index & 1 == 0 ? index + 1 : index - 1; 
+    return (index & 1) == 0 ? index + 1 : index - 1; 
 }
 
 std::tuple<size_t, uint8_t, uint8_t> TandemBloomFilter::getTandemValues(uint8_t i, uint8_t *key, uint16_t keyLength){
@@ -106,25 +106,17 @@ std::tuple<size_t, uint8_t, uint8_t> TandemBloomFilter::getTandemValues(uint8_t 
     (h_set.at(i)(key, keyLength) % (L_set - 1)) + 1); //[1 - L-1]
 }
 
-/*
-    f_set.at(i)(key, keyLength) % filter.size(),
-    (g_set.at(i)(key, keyLength) % (L_set + 1)) + L_set, //[L - 2L-1]
-    (h_set.at(i)(key, keyLength) % (L_set - 1)) + 1); //[1 - L-1]
-    */
-
-
-
-void TandemBloomFilter::increment(size_t index, uint8_t varIncrement){
-    if(UINT8_MAX - varIncrement < filter.at(index)){
+void TandemBloomFilter::increment(uint8_t& toInc, uint8_t varIncrement){
+    if(UINT8_MAX - varIncrement < toInc){
         std::cerr << "Counter overflow by couting bloom filter" << std::endl;
         return;
     }
-    filter.at(index) += varIncrement;
+    toInc += varIncrement;
 }
-void TandemBloomFilter::decrement(size_t index, uint8_t varIncrement){
-    if(filter.at(index) < varIncrement){
+void TandemBloomFilter::decrement(uint8_t& toInc, uint8_t varIncrement){
+    if(toInc < varIncrement){
         std::cerr << "Counter underflow by couting bloom filter" << std::endl;
         return;
     }
-    filter.at(index) -= varIncrement;
+    toInc -= varIncrement;
 }
