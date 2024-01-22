@@ -1,24 +1,18 @@
 #include "bf.hpp"
 
-BloomFilter::BloomFilter(size_t size) : _size{size * 8} {
-    hashFunctions = murmurHash64A_Array(nHashFunctions);
-    _filter.assign(size, 0);
-}
+BloomFilter::BloomFilter(size_t size, uint8_t nHashFunctions) : filter(ceil(size/8.0)), f_set{murmurHash64A_Vector(nHashFunctions)}{}
 
-size_t BloomFilter::size() { return _size; }
-
-bool BloomFilter::add(std::string_view item) {
-    for (size_t i = 0; i < nHashFunctions; ++i) {
-        auto pos = hashFunctions[i](item) % this->_size;
-        setBit(pos);
+void BloomFilter::add(uint8_t* key, uint16_t keyLength) {
+    for (size_t i = 0; i < f_set.size(); ++i) {
+        size_t index = f_set.at(i)(key, keyLength) % filter.size();
+        setBit(index);
     }
-    return true;
 }
 
-bool BloomFilter::lookup(std::string_view item) {
-    for (size_t i = 0; i < nHashFunctions; ++i) {
-        auto pos = hashFunctions[i](item) % this->_size;
-        if (!isSet(pos)) {
+bool BloomFilter::lookup(uint8_t* key, uint16_t keyLength) {
+    for (size_t i = 0; i < f_set.size(); ++i) {
+        size_t index = f_set.at(i)(key, keyLength) % filter.size();
+        if (!getBit(index)) {
             return false;
         }
     }
@@ -26,28 +20,13 @@ bool BloomFilter::lookup(std::string_view item) {
 }
 
 void BloomFilter::setBit(size_t index) {
-    size_t pos = index / u8size;
-    uint8_t mask = 1 << (index - (pos * u8size));
-    _filter.at(pos) = _filter.at(pos) | mask;
+    size_t pos = index / 8;
+    uint8_t mask = 1 << (index - (pos * 8));
+    filter.at(pos) = filter.at(pos) | mask;
 }
 
-bool BloomFilter::isSet(size_t index) {
-    size_t pos = index / u8size;
-    uint8_t mask = 1 << (index - (pos * u8size));
-    return (_filter.at(pos) & mask) != 0;
-}
-
-void BloomFilter::printBits(uint8_t value) {
-    for (int i = 7; i >= 0; --i) {
-        uint8_t bit = (value & (1 << i)) ? 1 : 0;
-        printf("%hhu", bit);
-    }
-}
-
-void BloomFilter::print() {
-    for (const auto& value : _filter) {
-        printBits(value);
-        printf(" ");
-    }
-    printf("\n");
+uint8_t BloomFilter::getBit(size_t index) {
+    size_t pos = index / 8;
+    uint8_t mask = 1 << (index - (pos * 8));
+    return filter.at(pos) & mask;
 }

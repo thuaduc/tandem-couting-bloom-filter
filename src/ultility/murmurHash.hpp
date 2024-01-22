@@ -1,8 +1,7 @@
 #include <cstdint>
-#include <memory>
 #include <functional>
-#include <string_view>
+#include <vector>
 
-uint64_t murmurHash64A(std::string_view k, uint64_t seed);
+uint64_t murmurHash64A(uint8_t *key, uint16_t keyLengh, uint64_t seed);
 
-std::unique_ptr<std::function<uint64_t(std::string_view)>[]> murmurHash64A_Array(uint32_t n);
+std::vector<std::function<uint64_t(uint8_t* key, uint16_t keyLength)>> murmurHash64A_Vector(uint8_t n);

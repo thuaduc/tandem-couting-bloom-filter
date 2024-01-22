@@ -1,19 +1,23 @@
 #pragma once
-#include "../bf/bf.hpp"
+#include "murmurHash.hpp"
+#include <cstdint>
+#include <vector>
+#include <cmath>
+#define LS_NIBBLE_MASK 0x0f
+#define MS_NIBBLE_MASK 0xf0
 
-#define lowMask 15    // 0b00001111
-#define highMask 240  // 0b11110000
-
-class CountingBloomFilter : public BloomFilter {
+class CountingBloomFilter {
    public:
-    CountingBloomFilter(size_t size);
-    virtual bool add(std::string_view item) override;
-    virtual bool lookup(std::string_view item) override;
-    virtual bool remove(std::string_view item);
+    CountingBloomFilter(size_t size, uint8_t nHashFunctions);
+    void add(uint8_t *key, uint16_t keyLength);
+    bool lookup(uint8_t *key, uint16_t keyLength);
+    bool remove(uint8_t *key, uint16_t keyLength);
+    ~CountingBloomFilter() = default;
 
    private:
-    void incrementCounterByOne(size_t index);
-    bool decrementCounterByOne(size_t index);
-    bool isCounterSet(size_t index);
-    void checkIndexValid(size_t index);
+    std::vector<uint8_t> filter;
+    std::vector<std::function<uint64_t(uint8_t* key, uint16_t keyLength)>> f_set;
+    void incrementNibble(size_t index);
+    void decrementNibble(size_t index);
+    uint8_t getNibble(size_t index);
 };

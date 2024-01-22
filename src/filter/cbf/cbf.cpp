@@ -1,114 +1,92 @@
 #include "cbf.hpp"
+#include <iostream>
 
-CountingBloomFilter::CountingBloomFilter(size_t size) : BloomFilter(size) {
-    _filter.assign(size * 4, 0);
+CountingBloomFilter::CountingBloomFilter(size_t size, uint8_t nHashFunctions) : filter(ceil(size/2.0)), f_set{murmurHash64A_Vector(nHashFunctions)}{}
+
+void CountingBloomFilter::add(uint8_t *key, uint16_t keyLength){
+    for (size_t i = 0; i < f_set.size(); ++i) {
+        size_t index = f_set.at(i)(key, keyLength) % filter.size();
+        incrementNibble(index);
+    }
 }
 
-bool CountingBloomFilter::add(std::string_view item) {
-    for (size_t i = 0; i < nHashFunctions; ++i) {
-        size_t pos = hashFunctions[i](item) % this->_size;
-        incrementCounterByOne(pos);
+bool CountingBloomFilter::lookup(uint8_t *key, uint16_t keyLength){
+    for (size_t i = 0; i < f_set.size(); ++i) {
+        size_t index = f_set.at(i)(key, keyLength) % filter.size();
+        if(!getNibble(index)){
+            return false;
+        }
     }
     return true;
 }
 
-bool CountingBloomFilter::remove(std::string_view item) {
-    if (!lookup(item)) {
+bool CountingBloomFilter::remove(uint8_t *key, uint16_t keyLength){
+    if(!lookup(key, keyLength)){
         return false;
     }
 
-    for (size_t i = 0; i < nHashFunctions; ++i) {
-        auto pos = hashFunctions[i](item) % this->_size;
-        decrementCounterByOne(pos);
+    for (size_t i = 0; i < f_set.size(); ++i) {
+        size_t index = f_set.at(i)(key, keyLength) % filter.size();
+        decrementNibble(index);
     }
     return true;
 }
 
-bool CountingBloomFilter::lookup(std::string_view item) {
-    for (size_t i = 0; i < nHashFunctions; ++i) {
-        auto pos = hashFunctions[i](item) % this->_size;
-        if (!isCounterSet(pos)) {
-            return false;
-        }
-    }
-    return true;
-}
-
-void CountingBloomFilter::checkIndexValid(size_t pos) {
-    if (pos >= _filter.size()) {
-        printf("pos: %zu size: %zu\n", pos, _filter.size());
-        exit(0);
-    }
-}
-
-void CountingBloomFilter::incrementCounterByOne(size_t index) {
+ void CountingBloomFilter::incrementNibble(size_t index){
     size_t pos = index / 2;
-    checkIndexValid(pos);
+    uint8_t msNibble;
+    uint8_t lsNibble;
 
-    uint8_t current, mask;
-
-    // increment high part of uint8
-    if (index % 2 != 0) {
-        current = (_filter.at(pos) & highMask) >> 4;
-        if (current == 15) {
-            std::cerr << "Counter overflow by couting bloom filter"
-                      << std::endl;
-            exit(0);
-        }
-        mask = _filter.at(pos) & lowMask;
-        _filter.at(pos) = (++current << 4) | mask;
-
-    }
     // increment low part of uint8
+    if (index & 1 == 0) {
+        lsNibble = filter.at(pos) & LS_NIBBLE_MASK;
+        if (lsNibble == 15) {
+            std::cerr << "Counter overflow by couting bloom filter" << std::endl;
+            return;
+        }
+        msNibble = filter.at(pos) & MS_NIBBLE_MASK;
+        filter.at(pos) = msNibble | (lsNibble + 1);
+    }
+    // increment high part of uint8
     else {
-        current = _filter.at(pos) & lowMask;
-        if (current == 15) {
-            std::cerr << "Counter overflow by couting bloom filter"
-                      << std::endl;
-            exit(0);
+        msNibble = (filter.at(pos) & MS_NIBBLE_MASK) >> 4;
+        if (msNibble == 15) {
+            std::cerr << "Counter overflow by couting bloom filter" << std::endl;
+            return;
         }
-        mask = _filter.at(pos) & highMask;
-        _filter.at(pos) = ++current | mask;
+        lsNibble = filter.at(pos) & LS_NIBBLE_MASK;
+        filter.at(pos) = ((msNibble + 1) << 4) | lsNibble;
     }
-}
+ }
 
-bool CountingBloomFilter::decrementCounterByOne(size_t index) {
+void CountingBloomFilter::decrementNibble(size_t index){
     size_t pos = index / 2;
-    checkIndexValid(pos);
-    uint8_t current, mask;
+    uint8_t msNibble;
+    uint8_t lsNibble;
 
-    // decrement high part of uint8
-    if (index % 2 != 0) {
-        current = (_filter.at(pos) & highMask) >> 4;
-        if (current == 0) {
-            return false;
-        }
-        mask = _filter.at(pos) & lowMask;
-        _filter.at(pos) = (--current << 4) | mask;
-
-    }
     // decrement low part of uint8
-    else {
-        current = _filter.at(pos) & lowMask;
-        if (current == 0) {
-            return false;
+    if (index & 1 == 0) {
+        lsNibble = filter.at(pos) & LS_NIBBLE_MASK;
+        if (lsNibble == 0) {
+            std::cerr << "Counter underflow by couting bloom filter" << std::endl;
+            return;
         }
-        mask = _filter.at(pos) & highMask;
-        _filter.at(pos) = --current | mask;
+        msNibble = filter.at(pos) & MS_NIBBLE_MASK;
+        filter.at(pos) = msNibble | (lsNibble - 1);
     }
-
-    return true;
+    // decrement high part of uint8
+    else {
+        msNibble = (filter.at(pos) & MS_NIBBLE_MASK) >> 4;
+        if (msNibble == 0) {
+            std::cerr << "Counter underflow by couting bloom filter" << std::endl;
+            return;
+        }
+        lsNibble = filter.at(pos) & LS_NIBBLE_MASK;
+        filter.at(pos) = ((msNibble - 1) << 4) | lsNibble;
+    }
 }
 
-bool CountingBloomFilter::isCounterSet(size_t index) {
+uint8_t CountingBloomFilter::getNibble(size_t index){
     size_t pos = index / 2;
-    checkIndexValid(pos);
-    uint8_t current;
-
-    if (index % 2 != 0) {
-        current = (_filter.at(pos) & highMask) >> 4;
-    } else {
-        current = _filter.at(pos) & lowMask;
-    }
-    return current != 0;
+    return index & 1 == 0 ? filter.at(pos) & LS_NIBBLE_MASK : (filter.at(pos) & MS_NIBBLE_MASK) >> 4;
 }

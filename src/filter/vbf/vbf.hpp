@@ -1,22 +1,22 @@
 #pragma once
-#include "../bf/bf.hpp"
-#define Range 8  // value increased in range L - 2L
+#include "murmurHash.hpp"
+#include <iostream>
+#include <cstdint>
+#include <vector>
 
-class VariableCoutingBloomFilter : public BloomFilter {
+class VariableCoutingBloomFilter {
    public:
-    VariableCoutingBloomFilter(size_t size);
-    virtual bool add(std::string_view item) override;
-    virtual bool lookup(std::string_view item) override;
-    virtual bool remove(std::string_view item);
-    virtual void increaseCounter(size_t index, uint8_t num);
-    virtual bool decreaseCounter(size_t index, uint8_t num);
-    void printFilter();
-
-   protected:
-    std::unique_ptr<std::function<uint64_t(std::string_view)>[]>
-        secondHashFunction;
+    VariableCoutingBloomFilter(size_t size, uint8_t nHashFunctions, uint8_t L_set);
+    void add(uint8_t *key, uint16_t keyLength);
+    bool lookup(uint8_t *key, uint16_t keyLength);
+    bool remove(uint8_t *key, uint16_t keyLength);
 
    private:
-    std::pair<size_t, uint8_t> calculatePositionAndHashValue(
-        size_t i, std::string_view item);
+    std::vector<uint8_t> filter;
+    std::vector<std::function<uint64_t(uint8_t* key, uint16_t keyLength)>> f_set;
+    std::vector<std::function<uint64_t(uint8_t* key, uint16_t keyLength)>> g_set;
+    uint8_t L_set;
+    void increment(size_t index, uint8_t var_increment);
+    void decrement(size_t index, uint8_t var_increment);
+    uint8_t getVarIncrement(uint8_t *key, uint16_t keyLength); 
 };
