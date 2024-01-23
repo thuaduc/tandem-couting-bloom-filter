@@ -29,15 +29,4 @@ int main() {
     // vbf.add(someRandomText);
     // vbf.lookup(someRandomText);
     // vbf.remove(someRandomText);
-
-    TandemBloomFilter tbf{size};
-    for (size_t i = 0; i < size; ++i) {
-        tbf.add(someRandomText + std::to_string(i));
-    }
-    tbf.printFilter();
-
-    for (size_t i = 0; i < size; ++i) {
-        std::cout << tbf.lookup(someRandomText + std::to_string(i)) << " ";
-    }
-    std::cout << std::endl;
 }

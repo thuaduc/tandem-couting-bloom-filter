@@ -1,8 +1,9 @@
 #pragma once
-#include "murmurHash.hpp"
+#include <cmath>
 #include <cstdint>
 #include <vector>
-#include <cmath>
+
+#include "../../ultility/murmurHash.hpp"
 
 class BloomFilter {
    public:
@@ -13,7 +14,8 @@ class BloomFilter {
 
    private:
     std::vector<uint8_t> filter;
-    std::vector<std::function<uint64_t(uint8_t* key, uint16_t keyLength)>> f_set;
+    std::vector<std::function<uint64_t(const uint8_t *key, uint16_t keyLength)>>
+        f_set;
     void setBit(size_t index);
     uint8_t getBit(size_t index);
 };

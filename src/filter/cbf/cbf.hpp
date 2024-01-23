@@ -1,22 +1,25 @@
 #pragma once
-#include "murmurHash.hpp"
+#include <cmath>
 #include <cstdint>
 #include <vector>
-#include <cmath>
-#define LS_NIBBLE_MASK 0x0f
+
+#include "../../ultility/murmurHash.hpp"
+
 #define MS_NIBBLE_MASK 0xf0
+#define LS_NIBBLE_MASK 0x0f
 
 class CountingBloomFilter {
    public:
     CountingBloomFilter(size_t size, uint8_t nHashFunctions);
-    void add(uint8_t *key, uint16_t keyLength);
-    bool lookup(uint8_t *key, uint16_t keyLength);
-    bool remove(uint8_t *key, uint16_t keyLength);
+    void add(const uint8_t *key, uint16_t keyLength);
+    bool lookup(const uint8_t *key, uint16_t keyLength);
+    bool remove(const uint8_t *key, uint16_t keyLength);
     ~CountingBloomFilter() = default;
 
    private:
     std::vector<uint8_t> filter;
-    std::vector<std::function<uint64_t(uint8_t* key, uint16_t keyLength)>> f_set;
+    std::vector<std::function<uint64_t(const uint8_t *key, uint16_t keyLength)>>
+        f_set;
     void incrementNibble(size_t index);
     void decrementNibble(size_t index);
     uint8_t getNibble(size_t index);
