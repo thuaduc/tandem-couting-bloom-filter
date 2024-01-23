@@ -1,6 +1,6 @@
 #include "bf.hpp"
 
-BloomFilter::BloomFilter(size_t size, uint8_t nHashFunctions) : filter(ceil(size/8.0)), f_set{murmurHash64A_Vector(nHashFunctions)}{}
+BloomFilter::BloomFilter(size_t m, uint8_t k) : filter(ceil(m/8.0)), f_set{murmurHash64A_Vector(k)}{}
 
 void BloomFilter::add(uint8_t* key, uint16_t keyLength) {
     for (size_t i = 0; i < f_set.size(); ++i) {

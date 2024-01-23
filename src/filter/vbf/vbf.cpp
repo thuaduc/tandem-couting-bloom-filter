@@ -1,11 +1,11 @@
 #include "vbf.hpp"
 
-VariableCoutingBloomFilter::VariableCoutingBloomFilter(size_t size, uint8_t nHashFunctions, uint8_t L_set) : filter(size), f_set{nHashFunctions}, g_set{nHashFunctions}{
-    if(!(2 <= L_set && (L_set & (L_set - 1)) == 0)){
+VariableCoutingBloomFilter::VariableCoutingBloomFilter(size_t m, uint8_t k, uint8_t L_set) : filter(m), f_set{k}, g_set{k}, L_set{L_set}{
+    if(2 > L_set || (L_set & (L_set - 1)) != 0 || 32 < L_set){
         std::cerr << "L ≥ 2 should be a positive integer of the form L = 2^i" << std::endl;
+        std::cerr << "L < should be (for our implementation) <= 32" << std::endl;
         exit(0);
     }
-    this->L_set = L_set;
 }
 
 void VariableCoutingBloomFilter::add(uint8_t *key, uint16_t keyLength){
@@ -53,7 +53,7 @@ void VariableCoutingBloomFilter::decrement(size_t index, uint8_t varIncrement){
 
 std::pair<size_t, uint8_t> VariableCoutingBloomFilter::getVBFvalues(size_t i, uint8_t *key, uint16_t keyLength){
     return std::make_pair(
-        f_set.at(i)(key, keyLength) % filter.size(), //[L-set - 2*L_set-1]
-        (g_set.at(i)(key, keyLength) % (L_set + 1)) + L_set
+        f_set.at(i)(key, keyLength) % filter.size(),
+        (g_set.at(i)(key, keyLength) % (L_set + 1)) + L_set //[L-set - 2*L_set-1]
     );
 }

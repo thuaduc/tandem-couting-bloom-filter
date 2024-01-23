@@ -7,7 +7,7 @@
 
 class VariableCoutingBloomFilter {
    public:
-    VariableCoutingBloomFilter(size_t size, uint8_t nHashFunctions, uint8_t L_set);
+    VariableCoutingBloomFilter(size_t m, uint8_t k, uint8_t L_set);
     void add(uint8_t *key, uint16_t keyLength);
     bool lookup(uint8_t *key, uint16_t keyLength);
     bool remove(uint8_t *key, uint16_t keyLength);

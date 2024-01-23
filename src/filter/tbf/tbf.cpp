@@ -1,12 +1,12 @@
 #include "tbf.hpp"
 
-
-TandemBloomFilter::TandemBloomFilter(size_t size, uint8_t nHashFunctions, uint8_t L_set): filter(size), f_set{nHashFunctions}, g_set{nHashFunctions}, h_set{nHashFunctions}{
-    if(!(2 <= L_set && (L_set & (L_set - 1)) == 0) && 64 < L_set){
-        std::cerr << "L ≥ 2 should be a positive integer of the form L = 2^i and for our implementation L_set <= 64" << std::endl;
+//m has to be even since every counter should have an adjecent counter
+TandemBloomFilter::TandemBloomFilter(size_t m, uint8_t k, uint8_t L_set): filter(((m & 1) == 0 ? m : n + 1)), f_set{k}, g_set{k}, h_set{k}, L_set{L_set}{
+    if(2 > L_set || (L_set & (L_set - 1)) != 0 || 32 < L_set){
+        std::cerr << "L ≥ 2 should be a positive integer of the form L = 2^i" << std::endl;
+        std::cerr << "L < should be (for our implementation) <= 32" << std::endl;
         exit(0);
     }
-    this->L_set = L_set;
 }
 
 void TandemBloomFilter::add(uint8_t *key, uint16_t keyLength){
@@ -25,8 +25,7 @@ void TandemBloomFilter::add(uint8_t *key, uint16_t keyLength){
             increment(initC1, c1);
             if(initC2 < L_set){
                 if(c1 - L_set + 1 < L_set){
-                    initC2 = c1 - L_set + 1;
-                    
+                    initC2 = c1 - L_set + 1;          
                 }
                 else if(initC1 - L_set + 1 < L_set){
                     initC2 = initC1 - L_set + 1;
@@ -95,7 +94,7 @@ bool TandemBloomFilter::remove(uint8_t *key, uint16_t keyLength){
     }
 }
 
-uint8_t TandemBloomFilter::getAdjecentIndex(size_t index){
+size_t TandemBloomFilter::getAdjecentIndex(size_t index){
     return (index & 1) == 0 ? index + 1 : index - 1; 
 }
 

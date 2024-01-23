@@ -6,7 +6,7 @@
 
 class BloomFilter {
    public:
-    BloomFilter(size_t size, uint8_t nHashFunctions);
+    BloomFilter(size_t m, uint8_t k);
     void add(uint8_t *key, uint16_t keyLength);
     bool lookup(uint8_t *key, uint16_t keyLength);
     ~BloomFilter() = default;

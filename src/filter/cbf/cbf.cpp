@@ -1,7 +1,7 @@
 #include "cbf.hpp"
 #include <iostream>
 
-CountingBloomFilter::CountingBloomFilter(size_t size, uint8_t nHashFunctions) : filter(ceil(size/2.0)), f_set{murmurHash64A_Vector(nHashFunctions)}{}
+CountingBloomFilter::CountingBloomFilter(size_t m, uint8_t k) : filter(ceil(m/2.0)), f_set{murmurHash64A_Vector(k)}{}
 
 void CountingBloomFilter::add(uint8_t *key, uint16_t keyLength){
     for (size_t i = 0; i < f_set.size(); ++i) {
