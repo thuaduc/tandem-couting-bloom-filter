@@ -19,5 +19,5 @@ class VariableCoutingBloomFilter {
     uint8_t L_set;
     void increment(size_t index, uint8_t var_increment);
     void decrement(size_t index, uint8_t var_increment);
-    std::pair<size_t, uint8_t> VariableCoutingBloomFilter::getVBFvalues(size_t i, uint8_t *key, uint16_t keyLength);
+    std::pair<size_t, uint8_t> getVBFvalues(size_t i, uint8_t *key, uint16_t keyLength);
 };

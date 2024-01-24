@@ -1,7 +1,7 @@
 #include "tbf.hpp"
 
 //m has to be even since every counter should have an adjecent counter
-TandemBloomFilter::TandemBloomFilter(size_t m, uint8_t k, uint8_t L_set): filter(((m & 1) == 0 ? m : n + 1)), f_set{k}, g_set{k}, h_set{k}, L_set{L_set}{
+TandemBloomFilter::TandemBloomFilter(size_t m, uint8_t k, uint8_t L_set): filter(((m & 1) == 0 ? m : m + 1)), f_set{k}, g_set{k}, h_set{k}, L_set{L_set}{
     if(2 > L_set || (L_set & (L_set - 1)) != 0 || 32 < L_set){
         std::cerr << "L ≥ 2 should be a positive integer of the form L = 2^i" << std::endl;
         std::cerr << "L < should be (for our implementation) <= 32" << std::endl;
@@ -92,6 +92,7 @@ bool TandemBloomFilter::remove(uint8_t *key, uint16_t keyLength){
             initC2 = 0;
         }
     }
+    return true;
 }
 
 size_t TandemBloomFilter::getAdjecentIndex(size_t index){
