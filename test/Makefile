@@ -15,7 +15,7 @@ bloom.a:
 	cd ..; make all
 
 test.o: test.cpp
-	$(CXX) $(CFLAGS) $< -o $(OBJDIR)$@
+	$(CXX) $(CFLAGS) -c $< -o $(OBJDIR)$@
 
 clean:
 	rm -rf $(OBJDIR)* $(BINDIR)*
