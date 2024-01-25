@@ -1,7 +1,7 @@
 #include "tbf.hpp"
 
 //m has to be even since every counter should have an adjecent counter
-TandemBloomFilter::TandemBloomFilter(size_t m, uint8_t k, uint8_t L_set): filter(((m & 1) == 0 ? m : m + 1)), f_set{k}, g_set{k}, h_set{k}, L_set{L_set}{
+TandemBloomFilter::TandemBloomFilter(size_t m, uint8_t k, uint8_t L_set): m{m}, k{k}, filter(((m & 1) == 0 ? m : m + 1)), f_set{murmurHash64A_Vector(k)}, g_set{murmurHash64A_Vector(k)}, h_set{murmurHash64A_Vector(k)}, L_set{L_set}{
     if(2 > L_set || (L_set & (L_set - 1)) != 0 || 32 < L_set){
         std::cerr << "L ≥ 2 should be a positive integer of the form L = 2^i" << std::endl;
         std::cerr << "L < should be (for our implementation) <= 32" << std::endl;
@@ -9,8 +9,8 @@ TandemBloomFilter::TandemBloomFilter(size_t m, uint8_t k, uint8_t L_set): filter
     }
 }
 
-void TandemBloomFilter::add(uint8_t *key, uint16_t keyLength){
-    for (size_t i = 0; i < f_set.size(); ++i) {
+void TandemBloomFilter::insert(uint8_t *key, uint16_t keyLength){
+    for (uint8_t i = 0; i < k; ++i) {
         auto [index, c1, c2] = getTBFvalues(i, key, keyLength);
         uint8_t& initC1 = filter.at(index);
         uint8_t& initC2 = filter.at(getAdjecentIndex(index));
@@ -21,7 +21,7 @@ void TandemBloomFilter::add(uint8_t *key, uint16_t keyLength){
                 initC2 = c2;
             }
         }
-        else if (c1 < 2*L_set){
+        else if (initC1 < 2*L_set){
             increment(initC1, c1);
             if(initC2 < L_set){
                 if(c1 - L_set + 1 < L_set){
@@ -45,7 +45,7 @@ void TandemBloomFilter::add(uint8_t *key, uint16_t keyLength){
 }
 
 bool TandemBloomFilter::lookup(uint8_t *key, uint16_t keyLength){
-    for (size_t i = 0; i < f_set.size(); ++i) {
+    for (uint8_t i = 0; i < k; ++i) {
         auto [index, c1, c2] = getTBFvalues(i, key, keyLength);
         uint8_t initC1 = filter.at(index);
         uint8_t initC2 = filter.at(getAdjecentIndex(index));
@@ -67,7 +67,7 @@ bool TandemBloomFilter::lookup(uint8_t *key, uint16_t keyLength){
                 if(initC2 == 1 && initC1 == 4*L_set - 2 && 2*L_set - 1 != c1){
                     return false;
                 }
-                else if(initC2 + L_set - 1 != c1 && initC1 - initC2 - L_set + 1 != c1){
+                else if(initC2 + L_set - 1 != c1 && initC1 - initC2 - L_set + 1 != c1 + initC2){
                     return false;
                 }
             }
@@ -78,7 +78,7 @@ bool TandemBloomFilter::lookup(uint8_t *key, uint16_t keyLength){
 }
 
 bool TandemBloomFilter::remove(uint8_t *key, uint16_t keyLength){
-    for (size_t i = 0; i < f_set.size(); ++i) {
+    for (uint8_t i = 0; i < k; ++i) {
         auto [index, c1, c2] = getTBFvalues(i, key, keyLength);
         uint8_t& initC1 = filter.at(index);
         uint8_t& initC2 = filter.at(getAdjecentIndex(index));
@@ -101,8 +101,8 @@ size_t TandemBloomFilter::getAdjecentIndex(size_t index){
 
 std::tuple<size_t, uint8_t, uint8_t> TandemBloomFilter::getTBFvalues(uint8_t i, uint8_t *key, uint16_t keyLength){
     return std::make_tuple(
-    f_set.at(i)(key, keyLength) % filter.size(),
-    (g_set.at(i)(key, keyLength) % (L_set + 1)) + L_set, //[L-set - 2*L_set-1]
+    f_set.at(i)(key, keyLength) % m,
+    (g_set.at(i)(key, keyLength) % L_set) + L_set, //[L-set - 2*L_set-1]
     (h_set.at(i)(key, keyLength) % (L_set - 1)) + 1); //[1 - L_set-1]
 }
 

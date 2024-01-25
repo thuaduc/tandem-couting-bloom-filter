@@ -4,7 +4,7 @@ OBJDIR = ../obj/
 INCDIR = ../include/ ../src/ .
 DOCDIR = doctest/
 
-CFLAGS = $(foreach D, $(INCDIR), -I$(D)) -I$(DOCDIR)
+CFLAGS = $(foreach D, $(INCDIR), -I$(D)) -I$(DOCDIR) -g -fsanitize=address -fsanitize=undefined -fsanitize=leak
 
 all: test
 

@@ -1,18 +1,17 @@
 #include "cbf.hpp"
-#include <iostream>
 
-CountingBloomFilter::CountingBloomFilter(size_t m, uint8_t k) : filter(ceil(m/2.0)), f_set{murmurHash64A_Vector(k)}{}
+CountingBloomFilter::CountingBloomFilter(size_t m, uint8_t k) : m{m}, k{k}, filter(ceil(m/2.0)), f_set{murmurHash64A_Vector(k)}{}
 
-void CountingBloomFilter::add(uint8_t *key, uint16_t keyLength){
-    for (size_t i = 0; i < f_set.size(); ++i) {
-        size_t index = f_set.at(i)(key, keyLength) % filter.size();
+void CountingBloomFilter::insert(uint8_t *key, uint16_t keyLength){
+    for (uint8_t i = 0; i < k; ++i) {
+        size_t index = f_set.at(i)(key, keyLength) % m;
         incrementNibble(index);
     }
 }
 
 bool CountingBloomFilter::lookup(uint8_t *key, uint16_t keyLength){
-    for (size_t i = 0; i < f_set.size(); ++i) {
-        size_t index = f_set.at(i)(key, keyLength) % filter.size();
+    for (uint8_t i = 0; i < k; ++i) {
+        size_t index = f_set.at(i)(key, keyLength) % m;
         if(!getNibble(index)){
             return false;
         }
@@ -25,15 +24,15 @@ bool CountingBloomFilter::remove(uint8_t *key, uint16_t keyLength){
         return false;
     }
 
-    for (size_t i = 0; i < f_set.size(); ++i) {
-        size_t index = f_set.at(i)(key, keyLength) % filter.size();
+    for (uint8_t i = 0; i < k; ++i) {
+        size_t index = f_set.at(i)(key, keyLength) % m;
         decrementNibble(index);
     }
     return true;
 }
 
  void CountingBloomFilter::incrementNibble(size_t index){
-    size_t pos = index / 2;
+    size_t pos = index >> 1;
     uint8_t msNibble;
     uint8_t lsNibble;
 
@@ -60,7 +59,7 @@ bool CountingBloomFilter::remove(uint8_t *key, uint16_t keyLength){
  }
 
 void CountingBloomFilter::decrementNibble(size_t index){
-    size_t pos = index / 2;
+    size_t pos = index >> 1;
     uint8_t msNibble;
     uint8_t lsNibble;
 
@@ -87,6 +86,6 @@ void CountingBloomFilter::decrementNibble(size_t index){
 }
 
 uint8_t CountingBloomFilter::getNibble(size_t index){
-    size_t pos = index / 2;
-    return (index & 1) == 0 ? filter.at(pos) & LS_NIBBLE_MASK : (filter.at(pos) & MS_NIBBLE_MASK) >> 4;
+    size_t pos = index >> 1;
+    return (index & 1) == 0 ? filter.at(pos) & LS_NIBBLE_MASK : (filter.at(pos) & MS_NIBBLE_MASK);
 }

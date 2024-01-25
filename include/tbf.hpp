@@ -8,15 +8,17 @@
 class TandemBloomFilter {
    public:
     TandemBloomFilter(size_t m, uint8_t k, uint8_t L_set);
-    void add(uint8_t *key, uint16_t keyLength);
+    void insert(uint8_t *key, uint16_t keyLength);
     bool lookup(uint8_t *key, uint16_t keyLength);
     bool remove(uint8_t *key, uint16_t keyLength);
 
    private:
+    size_t m; 
+    uint8_t k;
     std::vector<uint8_t> filter;
-    std::vector<std::function<uint64_t(uint8_t* key, uint16_t keyLength)>> f_set;
-    std::vector<std::function<uint64_t(uint8_t* key, uint16_t keyLength)>> g_set;
-    std::vector<std::function<uint64_t(uint8_t* key, uint16_t keyLength)>> h_set;
+    std::vector<std::function<uint64_t(uint8_t *key, uint16_t keyLength)>> f_set;
+    std::vector<std::function<uint64_t(uint8_t *key, uint16_t keyLength)>> g_set;
+    std::vector<std::function<uint64_t(uint8_t *key, uint16_t keyLength)>> h_set;
     uint8_t L_set;
     void increment(uint8_t& toInc, uint8_t varIncrement);
     void decrement(uint8_t& toInc, uint8_t varIncrement);
