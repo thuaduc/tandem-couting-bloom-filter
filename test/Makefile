@@ -9,7 +9,7 @@ CFLAGS = $(foreach D, $(INCDIR), -I$(D)) -I$(DOCDIR)
 all: test
 
 test: bloom.a test.o
-	$(CXX) $(CFLAGS) $(OBJDIR)test.o -o $(BINDIR)test -L $(BINDIR)bloom.a
+	$(CXX) $(CFLAGS) $(OBJDIR)test.o -o $(BINDIR)test $(BINDIR)bloom.a
 
 bloom.a:
 	cd ..; make all
