@@ -28,7 +28,7 @@ int main(int argc, char const *argv[])
 {
     std::vector<std::vector<uint8_t>> data;
     std::vector<uint64_t> v;
-    uint64_t n = 2;
+    uint64_t n = 10000000;
     for (uint64_t i = 0; i < n; i+=2)
         v.push_back(i);
     for (auto x: v) {
@@ -57,10 +57,12 @@ int main(int argc, char const *argv[])
     TandemBloomFilter vbf{80000000, 5, 4};
     double start = currentTime();
     vbf.insert(data.at(0).data(), data.at(0).size());
-    vbf.insert(data.at(0).data(), data.at(0).size());            
-    // for(uint64_t i = 0; i < data.size(); i++){
-    //     vbf.insert(data.at(i).data(), data.at(i).size());
-    // }
+    vbf.insert(data.at(0).data(), data.at(0).size());     
+    assert(vbf.lookup(data.at(0).data(), data.at(0).size()));       
+    for(uint64_t i = 0; i < data.size(); i++){
+        vbf.insert(data.at(i).data(), data.at(i).size());
+    }
+
     for(uint64_t i = 0; i < data.size(); i++){
         assert(vbf.lookup(data.at(i).data(), data.at(i).size()));
         

@@ -22,18 +22,18 @@ void TandemBloomFilter::insert(uint8_t *key, uint16_t keyLength){
             }
         }
         else if(c1 < (2 * L_set)){
-            c1 = c1 + vgi;
             if(c2 < L_set){
-                if((vgi + 1) < (2*L_set)){
+                if((vgi - L_set + 1) < L_set){
                     c2 = vgi - L_set + 1;
                 }
-                else if((c1 + 1) < (2*L_set)){
+                else if((c1 - L_set + 1) < L_set){
                     c2 = c1 - L_set + 1;
                 }
                 else{
                     c2 = 1;
                 }
             }
+            c1 = c1 + vgi;
         }
         else{
             c1 = c1 + vgi;
@@ -64,13 +64,14 @@ bool TandemBloomFilter::lookup(uint8_t *key, uint16_t keyLength){
         }
         else {
             if((1 <= c2) && (c2 < L_set)){
-                if((c2 == 1) && (c1 == (4*L_set-2)) && ((2*L_set - 1) != vgi)){
+                if((c2 == 1) && (c1 == (4*L_set-2))){
+                    if((2*L_set - 1) != vgi){
+                        return false;
+                    }
+                }
+                else if(c2 + L_set - 1 != vgi && c1 - c2 - L_set + 1 != vgi){
                     return false;
                 }
-                else if(((c2 + L_set) != (vgi + 1)) && ((c1 - c2 - L_set + 1) != vgi)){
-                    printf("TEST\n");
-                    return false;
-                }   
             }
         }
     }
