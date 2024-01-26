@@ -5,7 +5,7 @@ OBJDIR = obj/
 TESTDIR = test/
 BINDIR = bin/
 
-CFLAGS = -Wall -Wextra -c $(foreach D, $(INCDIR), -I$(D)) -g -fsanitize=address -fsanitize=undefined -fsanitize=leak
+CFLAGS = -Wall -Wextra -c $(foreach D, $(INCDIR), -I$(D)) -O3
 
 all: bloom.a
 
