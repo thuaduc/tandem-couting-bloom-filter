@@ -99,10 +99,12 @@ TEST_CASE("Benchmark Couting Bloom Filter") {
     BenchmarkArray benchmarkArr{};
     InputArray inputArr{};
 
-    std::ifstream file("urls");
+    std::ifstream file("urls.txt");
     if (file.is_open()) {
-        for (std::string str; std::getline(file, str);) {
-            inputArr[i] = std::vector<uint8_t>(str.begin(), str.end());
+        for (size_t i = 0; i < numOfInput; ++i) {
+            std::string str;
+            std::getline(file, str);
+            // inputArr.at(i) = std::vector<uint8_t>(str.begin(), str.end());
         }
         file.close();
     } else {
