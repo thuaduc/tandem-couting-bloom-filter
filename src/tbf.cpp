@@ -33,10 +33,10 @@ void TandemBloomFilter::insert(uint8_t *key, uint16_t keyLength){
                     c2 = 1;
                 }
             }
-            c1 = c1 + vgi;
+            increment(c1, vgi);
         }
         else{
-            c1 = c1 + vgi;
+            increment(c1, vgi);
             if((1 <= c2) && (c2 < L_set)){
                 c2 = 0;
             }
