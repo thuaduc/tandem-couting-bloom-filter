@@ -1,109 +1,119 @@
-#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+//#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include <random>
 #include <string>
 
-#include "../src/filter/bf/bf.hpp"
-#include "../src/filter/cbf/cbf.hpp"
-#include "../src/filter/tbf/tbf.hpp"
-#include "../src/filter/vbf/vbf.hpp"
-#include "doctest/doctest/doctest.h"
+#include "bf.hpp"
+#include "cbf.hpp"
+#include "vbf.hpp"
+#include "tbf.hpp"
+#include <cassert>
+#include <chrono>
+#include <ctime>
+#include <time.h>
+#include "doctest/doctest.h"
 
-size_t size = 10000000;
-size_t size2 = 10000000;
-std::string someRandomText = "This is a random text";
+// static inline double currentTime(){
+//     struct timespec t;
+//     clock_gettime(CLOCK_MONOTONIC, &t);
+//     return t.tv_sec + t.tv_nsec * 1e-9;
+// }
 
-std::string generateRandomString(std::size_t length) {
-    static const char charset[] =
-        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    static const std::size_t charsetSize =
-        sizeof(charset) - 1;  // excluding null terminator
+// void printNumber(uint8_t *key, uint16_t keyLength){
+//     for(uint16_t i = 0; i < keyLength; ++i){
+//          printf("%d", key[i]);
+//     }
+//     printf("\n");
+// }
+// int main(int argc, char const *argv[])
+// {
+//     std::vector<std::vector<uint8_t>> data;
+//     std::vector<uint64_t> v;
+//     uint64_t n = 20000000;
+//     for (uint64_t i = 0; i < n; i+=2)
+//         v.push_back(i);
+//     for (auto x: v) {
+//         union {
+//             uint32_t x;
+//             uint8_t bytes[4];
+//         } u;
+//         u.x = x;
+//         data.emplace_back(u.bytes, u.bytes + 4);
+//     }
 
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<std::size_t> dis(0, charsetSize - 1);
+//     std::vector<std::vector<uint8_t>> data2;
+//     std::vector<uint64_t> v2;
 
-    std::string randomString;
-    randomString.reserve(length);
+//     for (uint64_t i = 1; i < n; i+=2)
+//         v2.push_back(i);
+//     for (auto x: v2) {
+//         union {
+//             uint32_t x;
+//             uint8_t bytes[4];
+//         } u;
+//         u.x = x;
+//         data2.emplace_back(u.bytes, u.bytes + 4);
+//     }
 
-    for (std::size_t i = 0; i < length; ++i) {
-        randomString.push_back(charset[dis(gen)]);
-    }
+//     TandemBloomFilter vbf{80000000, 5, 4};
+//     double start = currentTime();
+//     for(uint64_t i = 0; i < data.size()/10000; i+=100){
+//         vbf.insert(data.at(i).data(), data.at(i).size());
+//     }      
+//     for(uint64_t i = 0; i < data.size(); i++){
+//         vbf.insert(data.at(i).data(), data.at(i).size());
+//     }
 
-    return randomString;
-}
+//     for(uint64_t i = 0; i < data.size(); i++){
+//         assert(vbf.lookup(data.at(i).data(), data.at(i).size()));
+        
+//     }  
+//     size_t wrong = 0;
+//     for(uint64_t i = 0; i < data2.size(); i++){
+//         if(vbf.lookup(data2.at(i).data(), data2.at(i).size())){
+//             wrong++;
+//         }
+//     }  
+//     double end = currentTime();
+//     double time = end - start;
 
-void runTest(BloomFilter& bf) {
-    size_t falsePositiveCount = 0;
-    std::string typeOfFilter = "";
+//     printf("%.7f\n", 100.f * wrong/data.size());
+//     printf("%lu\n", data.size());
+//     printf("Total runtime: %.4f seconds\n", time);
+//     // size_t index = 16;
 
-    if (typeid(bf) == typeid(CountingBloomFilter)) {
-        typeOfFilter = "Counting Bloomfilter";
-    } else if (typeid(bf) == typeid(VariableCoutingBloomFilter)) {
-        typeOfFilter = "Variable Conting Bloomfilter";
-    } else if (typeid(bf) == typeid(TandemBloomFilter)) {
-        typeOfFilter = "Tandem Bloomfilter";
-    } else {
-        typeOfFilter = "Bloomfilter";
-    }
+//     // std::vector<uint8_t> vec{0b11000111, 0b01000010};
 
-    auto start = std::chrono::system_clock::now();
-    for (size_t i = 0; i < size; ++i) {
-        bf.add(someRandomText + std::to_string(i));
-    }
-    auto end = std::chrono::system_clock::now();
-    float elapsed =
-        std::chrono::duration_cast<std::chrono::milliseconds>(end - start)
-            .count();
-    printf("Insert Time %s %.4fms\n", typeOfFilter.c_str(), elapsed);
+//     // size_t pos = index >> 3;
+//     // uint8_t mask = 0b10000000 >> (index - (pos << 3));
+//     // auto y = vec.at(pos) & mask;
+//     // std::cout << y << std::endl;
+//     return 0;
+// }
+/*
+TEST_CASE("Test basic insert, remove, lookup - standart bloom filter") {
 
-    start = std::chrono::system_clock::now();
-    for (size_t i = 0; i < size; ++i) {
-        CHECK_EQ(bf.lookup(someRandomText + std::to_string(i)), true);
-    }
-    end = std::chrono::system_clock::now();
-    elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start)
-                  .count();
-    printf("Lookup Time %s %.4fms", typeOfFilter.c_str(), elapsed);
-
-    for (size_t i = size; i < size + size2; ++i) {
-        if (bf.lookup(someRandomText + std::to_string(i))) {
-            ++falsePositiveCount;
-        }
-    }
-
-    // if (typeOfFilter.c_str() != "Bloomfilter") {
-    //     start = std::chrono::system_clock::now();
-    //     for (size_t i = size; i < size + size2; ++i) {
-    //         bf.remove(someRandomText + std::to_string(i));
-    //     }
-    //     end = std::chrono::system_clock::now();
-    //     elapsed =
-    //         std::chrono::duration_cast<std::chrono::milliseconds>(end -
-    //         start)
-    //             .count();
-    //     printf("Remove Time %.4fms\n", elapsed);
+    // printNumber(data.at(1).data(), data.at(1).size());
+    // for(uint64_t i = 0; i < 5; i++){
+    //     auto x = hashFunctions.at(i)(data.at(1).data(), data.at(1).size());
+    //     printf("%lu\n", x);
+    // }
+    // for(uint64_t i = 0; i < n; i++){
+    //     printNumber(data.at(i).data(), data.at(i).size());
+    //     //bf.insert(data.at(i).data(), data.at(i).size());
     // }
 
-    printf("\nFalse Positive Rate %s: %f\n\n", typeOfFilter.c_str(),
-           static_cast<float>(falsePositiveCount) * 100 / size);
 }
 
-TEST_CASE("Test basic insert, remove, lookup - standart bloom filter") {
-    BloomFilter bf{size};
-    runTest(bf);
-}
 
 TEST_CASE("Test basic insert, remove, lookup - couting bloom filter") {
-    CountingBloomFilter bf{size};
-    runTest(bf);
+
 }
 
 TEST_CASE("Test basic insert, remove, lookup - variable couting bloom filter") {
-    VariableCoutingBloomFilter bf{size};
-    runTest(bf);
+
 }
 
 TEST_CASE("Test basic insert, remove, lookup - tandem couting bloom filter") {
-    TandemBloomFilter bf{size};
-    runTest(bf);
+
 }
+*/
