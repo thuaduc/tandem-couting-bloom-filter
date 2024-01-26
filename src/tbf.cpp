@@ -11,34 +11,34 @@ TandemBloomFilter::TandemBloomFilter(size_t m, uint8_t k, uint8_t L_set): m{m}, 
 
 void TandemBloomFilter::insert(uint8_t *key, uint16_t keyLength){
     for (uint8_t i = 0; i < k; ++i) {
-        auto [index, c1, c2] = getTBFvalues(i, key, keyLength);
-        uint8_t& initC1 = filter.at(index);
-        uint8_t& initC2 = filter.at(getAdjecentIndex(index));
+        auto [pos, vgi, whi] = getTBFvalues(i, key, keyLength);
+        uint8_t& c1 = filter.at(pos);
+        uint8_t& c2 = filter.at(getAdjecentIndex(pos));
 
-        if(initC1 < L_set){
-            initC1 = c1;
-            if(initC2 == 0){
-                initC2 = c2;
+        if(c1 < L_set){
+            c1 = vgi;
+            if(c2 == 0){
+                c2 = whi;
             }
         }
-        else if (initC1 < 2*L_set){
-            increment(initC1, c1);
-            if(initC2 < L_set){
-                if(c1 - L_set + 1 < L_set){
-                    initC2 = c1 - L_set + 1;          
+        else if(c1 < (2 * L_set)){
+            c1 = c1 + vgi;
+            if(c2 < L_set){
+                if((vgi + 1) < (2*L_set)){
+                    c2 = vgi - L_set + 1;
                 }
-                else if(initC1 - L_set + 1 < L_set){
-                    initC2 = initC1 - L_set + 1;
+                else if((c1 + 1) < (2*L_set)){
+                    c2 = c1 - L_set + 1;
                 }
                 else{
-                    initC2 = 1;
+                    c2 = 1;
                 }
             }
         }
         else{
-            increment(initC1, c1);
-            if(1 <= initC2 && initC2 < L_set){
-                initC2 = 0;
+            c1 = c1 + vgi;
+            if((1 <= c2) && (c2 < L_set)){
+                c2 = 0;
             }
         }
     }
@@ -46,30 +46,31 @@ void TandemBloomFilter::insert(uint8_t *key, uint16_t keyLength){
 
 bool TandemBloomFilter::lookup(uint8_t *key, uint16_t keyLength){
     for (uint8_t i = 0; i < k; ++i) {
-        auto [index, c1, c2] = getTBFvalues(i, key, keyLength);
-        uint8_t initC1 = filter.at(index);
-        uint8_t initC2 = filter.at(getAdjecentIndex(index));
-        if(initC1 < c1 || (1 <= (initC1 - c1) && (initC1 - c1) < L_set)){
+        auto [pos, vgi, whi] = getTBFvalues(i, key, keyLength);
+        uint8_t c1 = filter.at(pos);
+        uint8_t c2 = filter.at(getAdjecentIndex(pos));
+
+        if((c1 < vgi) || ((1 <= (c1 - vgi)) && ((c1 - vgi)< L_set))){
             return false;
         }
 
-        if(initC1 < 2*L_set){
-            if(initC1 != c1){
+        if(c1 < 2*L_set){
+            if(c1 != vgi){
                 return false;
             }
-            else if((1 <= initC2 && initC2 < L_set) && initC2 != c2){
+            else if(((1 <= c2) && (c2 < L_set)) && (c2 != whi)){
                 return false;
             }
         }
-
-        else{
-            if(1 <= initC2 && initC2 < L_set){
-                if(initC2 == 1 && initC1 == 4*L_set - 2 && 2*L_set - 1 != c1){
+        else {
+            if((1 <= c2) && (c2 < L_set)){
+                if((c2 == 1) && (c1 == (4*L_set-2)) && ((2*L_set - 1) != vgi)){
                     return false;
                 }
-                else if(initC2 + L_set - 1 != c1 && initC1 - initC2 - L_set + 1 != c1 + initC2){
+                else if(((c2 + L_set) != (vgi + 1)) && ((c1 - c2 - L_set + 1) != vgi)){
+                    printf("TEST\n");
                     return false;
-                }
+                }   
             }
         }
     }
