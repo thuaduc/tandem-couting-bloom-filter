@@ -1,18 +1,21 @@
 #include "cbf.hpp"
 
-CountingBloomFilter::CountingBloomFilter(size_t m, uint8_t k)
-    : m{m}, k{k}, filter(m), f_set{setOfMurmurHash64A(k)} {}
+CountingBloomFilter::CountingBloomFilter(size_t m, uint8_t k): 
+    f_set{setOfMurmurHash64A(k)},
+    filter(m),
+    slots{static_cast<uint64_t>(ceil(m / 4.f))}
+    {}
 
 void CountingBloomFilter::insert(uint8_t *key, uint16_t keyLength) {
-    for (uint8_t i = 0; i < k; ++i) {
-        size_t index = f_set.at(i)(key, keyLength) % m;
+    for (uint8_t i = 0; i < f_set.size(); ++i) {
+        size_t index = f_set.at(i)(key, keyLength) % slots;
         incrementNibble(index);
     }
 }
 
 bool CountingBloomFilter::lookup(uint8_t *key, uint16_t keyLength) {
-    for (uint8_t i = 0; i < k; ++i) {
-        size_t index = f_set.at(i)(key, keyLength) % m;
+    for (uint8_t i = 0; i < f_set.size(); ++i) {
+        size_t index = f_set.at(i)(key, keyLength) % slots;
         if (!getNibble(index)) {
             return false;
         }
@@ -25,8 +28,8 @@ bool CountingBloomFilter::remove(uint8_t *key, uint16_t keyLength) {
         return false;
     }
 
-    for (uint8_t i = 0; i < k; ++i) {
-        size_t index = f_set.at(i)(key, keyLength) % m;
+    for (uint8_t i = 0; i < f_set.size(); ++i) {
+        size_t index = f_set.at(i)(key, keyLength) % slots;
         decrementNibble(index);
     }
     return true;
