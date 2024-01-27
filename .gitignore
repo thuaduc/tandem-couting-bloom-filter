@@ -7,3 +7,7 @@ src/build
 *.a
 src/test
 test/doctest
+test/test.dSYM
+bin/urls
+*.tmp
+bin/test
