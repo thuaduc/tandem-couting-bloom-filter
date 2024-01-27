@@ -9,8 +9,8 @@ CFLAGS = -Wall -Wextra -c $(foreach D, $(INCDIR), -I$(D)) -O3
 
 all: bloom.a
 
-bloom.a: bf.o cbf.o vbf.o tbf.o murmurHash.o
-	ar rcs $(BINDIR)bloom.a $(OBJDIR)bf.o $(OBJDIR)cbf.o $(OBJDIR)vbf.o $(OBJDIR)tbf.o $(OBJDIR)murmurHash.o
+bloom.a: bf.o cbf.o vbf.o tbf.o murmurHash.o utility.o
+	ar rcs $(BINDIR)bloom.a $(OBJDIR)bf.o $(OBJDIR)cbf.o $(OBJDIR)vbf.o $(OBJDIR)tbf.o $(OBJDIR)murmurHash.o $(OBJDIR)utility.o
 	
 bf.o: $(SRCDIR)bf.cpp
 	$(CXX) $(CFLAGS) $< -o $(OBJDIR)$@
@@ -25,6 +25,9 @@ tbf.o: $(SRCDIR)tbf.cpp
 	$(CXX) $(CFLAGS) $< -o $(OBJDIR)$@ 
 
 murmurHash.o: $(SRCDIR)murmurHash.cpp
+	$(CXX) $(CFLAGS) $< -o $(OBJDIR)$@
+
+utility.o: $(SRCDIR)utility.cpp
 	$(CXX) $(CFLAGS) $< -o $(OBJDIR)$@
 
 test: $(TESTDIR)test.cpp
