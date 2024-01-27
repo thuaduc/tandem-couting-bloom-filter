@@ -2,7 +2,7 @@ CXX = clang++ -std=c++20
 BINDIR = ../bin/
 OBJDIR = ../obj/
 INCDIR = ../include/ ../src/ .
-DOCDIR = doctest/
+DOCDIR = doctest/ #Path to doctest
 
 CFLAGS = $(foreach D, $(INCDIR), -I$(D)) -I$(DOCDIR) -O3
 
