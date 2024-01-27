@@ -1,4 +1,5 @@
 #include "murmurHash.hpp"
+#include "utility.hpp"
 
 //MurmurHash64A
 uint64_t murmurHash64A (const uint8_t *key, uint16_t len, uint64_t seed) {
@@ -50,11 +51,4 @@ std::vector<std::function<uint64_t(uint8_t* key, uint16_t keyLength)>> setOfMurm
     }
     
     return hashFunctions;
-}
-
-uint64_t randomSeed64()
-{
-    static std::mt19937_64 rng(42);
-    static std::uniform_int_distribution<uint64_t> distribution(0, UINT64_MAX);
-    return distribution(rng);
 }
