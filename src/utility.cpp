@@ -7,11 +7,6 @@ uint64_t randomSeed64()
     return distribution(rng);
 }
 
-uint64_t roundUp4(uint64_t x)
-{
-    return ((x + 3) >> 2) << 2;
-}
-
 uint64_t roundUp16(uint64_t x)
 {
     return ((x + 15) >> 4) << 4;
