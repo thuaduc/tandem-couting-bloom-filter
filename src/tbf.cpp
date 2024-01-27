@@ -2,21 +2,13 @@
 
 // m has to be even since every counter should have an adjecent counter
 TandemBloomFilter::TandemBloomFilter(size_t m, uint8_t k, uint8_t L_set)
-    : m{m * 8},
+    : m{((m & 1) == 0 ? m : m + 1)},
       k{k},
-      filter(m * 8),
-      f_set{murmurHash64A_Vector(k)},
-      g_set{murmurHash64A_Vector(k)},
-      h_set{murmurHash64A_Vector(k)},
-      L_set{L_set} {
-    if (2 > L_set || (L_set & (L_set - 1)) != 0 || 32 < L_set) {
-        std::cerr << "L ≥ 2 should be a positive integer of the form L = 2^i"
-                  << std::endl;
-        std::cerr << "L < should be (for our implementation) <= 32"
-                  << std::endl;
-        exit(0);
-    }
-}
+      filter(this->m),
+      f_set{setOfMurmurHash64A(k)},
+      g_set{setOfMurmurHash64A(k)},
+      h_set{setOfMurmurHash64A(k)},
+      L_set{(L_set & (L_set - 1)) == 0 && (2 <= L_set && L_set <= 32) ? L_set : 4} {}
 
 void TandemBloomFilter::insert(uint8_t* key, uint16_t keyLength) {
     for (uint8_t i = 0; i < k; ++i) {
@@ -85,6 +77,11 @@ bool TandemBloomFilter::lookup(uint8_t* key, uint16_t keyLength) {
 }
 
 bool TandemBloomFilter::remove(uint8_t* key, uint16_t keyLength) {
+    
+    if(!lookup(key, keyLength)){
+        return false;
+    }
+
     for (uint8_t i = 0; i < k; ++i) {
         auto [index, c1, c2] = getTBFvalues(i, key, keyLength);
         uint8_t& initC1 = filter.at(index);
@@ -115,16 +112,12 @@ std::tuple<size_t, uint8_t, uint8_t> TandemBloomFilter::getTBFvalues(
 }
 
 void TandemBloomFilter::increment(uint8_t& toInc, uint8_t varIncrement) {
-    if (UINT8_MAX - varIncrement < toInc) {
-        std::cerr << "Counter overflow by couting bloom filter" << std::endl;
-        return;
+    if (toInc <= UINT8_MAX - varIncrement) {
+        toInc += varIncrement;
     }
-    toInc += varIncrement;
 }
-void TandemBloomFilter::decrement(uint8_t& toInc, uint8_t varIncrement) {
-    if (toInc < varIncrement) {
-        std::cerr << "Counter underflow by couting bloom filter" << std::endl;
-        return;
+void TandemBloomFilter::decrement(uint8_t& toDec, uint8_t varIncrement) {
+    if (varIncrement <= toDec) {
+        toDec -= varIncrement;
     }
-    toInc -= varIncrement;
 }

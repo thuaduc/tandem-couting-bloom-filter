@@ -1,9 +1,9 @@
 #pragma once
-#include "murmurHash.hpp"
-#include <iostream>
 #include <cstdint>
 #include <vector>
 #include <tuple>
+
+#include "murmurHash.hpp"
 
 class TandemBloomFilter {
    public:

@@ -1,8 +1,9 @@
 #pragma once
-#include "murmurHash.hpp"
 #include <cstdint>
 #include <vector>
 #include <cmath>
+
+#include "murmurHash.hpp"
 
 class BloomFilter {
    public:

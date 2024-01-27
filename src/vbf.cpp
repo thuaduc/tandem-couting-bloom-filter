@@ -2,20 +2,12 @@
 
 VariableCoutingBloomFilter::VariableCoutingBloomFilter(size_t m, uint8_t k,
                                                        uint8_t L_set)
-    : m{m * 8},
+    : m{m},
       k{k},
-      filter(m * 8),
-      f_set{murmurHash64A_Vector(k)},
-      g_set{murmurHash64A_Vector(k)},
-      L_set{L_set} {
-    if (2 > L_set || (L_set & (L_set - 1)) != 0 || 32 < L_set) {
-        std::cerr << "L ≥ 2 should be a positive integer of the form L = 2^i"
-                  << std::endl;
-        std::cerr << "L < should be (for our implementation) <= 32"
-                  << std::endl;
-        exit(0);
-    }
-}
+      filter(m),
+      f_set{setOfMurmurHash64A(k)},
+      g_set{setOfMurmurHash64A(k)},
+      L_set{(L_set & (L_set - 1)) == 0 && (2 <= L_set && L_set <= 32) ? L_set : 4} {}
 
 void VariableCoutingBloomFilter::insert(uint8_t *key, uint16_t keyLength) {
     for (uint8_t i = 0; i < k; ++i) {
@@ -47,14 +39,12 @@ bool VariableCoutingBloomFilter::remove(uint8_t *key, uint16_t keyLength) {
 
 void VariableCoutingBloomFilter::increment(size_t index, uint8_t varIncrement) {
     if (UINT8_MAX - varIncrement < filter.at(index)) {
-        std::cerr << "Counter overflow by couting bloom filter" << std::endl;
         return;
     }
     filter.at(index) += varIncrement;
 }
 void VariableCoutingBloomFilter::decrement(size_t index, uint8_t varIncrement) {
     if (filter.at(index) < varIncrement) {
-        std::cerr << "Counter underflow by couting bloom filter" << std::endl;
         return;
     }
     filter.at(index) -= varIncrement;

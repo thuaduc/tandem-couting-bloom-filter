@@ -1,9 +1,9 @@
 #pragma once
-#include "murmurHash.hpp"
-#include <iostream>
 #include <cstdint>
 #include <vector>
 #include <utility>
+
+#include "murmurHash.hpp"
 
 class VariableCoutingBloomFilter {
    public:

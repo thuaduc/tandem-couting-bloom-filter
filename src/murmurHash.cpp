@@ -40,19 +40,19 @@ uint64_t murmurHash64A (const uint8_t *key, uint16_t len, uint64_t seed) {
     return h;
 }
 
-std::vector<std::function<uint64_t(uint8_t* key, uint16_t keyLength)>> murmurHash64A_Vector(uint8_t n){
+std::vector<std::function<uint64_t(uint8_t* key, uint16_t keyLength)>> setOfMurmurHash64A(uint8_t n){
     auto hashFunctions = std::vector<std::function<uint64_t(uint8_t* key, uint16_t keyLength)>>();
     hashFunctions.reserve(n);
 
     for(uint32_t i = 0; i < n; ++i){
-        uint32_t seed = randomSeed();
+        uint32_t seed = randomSeed64();
         hashFunctions.emplace_back([seed](uint8_t *key, uint16_t keyLength){ return murmurHash64A(key, keyLength, seed);});
     }
     
     return hashFunctions;
 }
 
-uint64_t randomSeed()
+uint64_t randomSeed64()
 {
     static std::mt19937_64 rng(42);
     static std::uniform_int_distribution<uint64_t> distribution(0, UINT64_MAX);

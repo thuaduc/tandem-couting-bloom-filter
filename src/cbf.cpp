@@ -1,7 +1,7 @@
 #include "cbf.hpp"
 
 CountingBloomFilter::CountingBloomFilter(size_t m, uint8_t k)
-    : m{m * 8}, k{k}, filter(m * 4), f_set{murmurHash64A_Vector(k)} {}
+    : m{m}, k{k}, filter(m), f_set{setOfMurmurHash64A(k)} {}
 
 void CountingBloomFilter::insert(uint8_t *key, uint16_t keyLength) {
     for (uint8_t i = 0; i < k; ++i) {
@@ -41,8 +41,6 @@ void CountingBloomFilter::incrementNibble(size_t index) {
     if ((index & 1) == 0) {
         lsNibble = filter.at(pos) & LS_NIBBLE_MASK;
         if (lsNibble == 15) {
-            std::cerr << "Counter overflow by couting bloom filter"
-                      << std::endl;
             return;
         }
         msNibble = filter.at(pos) & MS_NIBBLE_MASK;
@@ -52,8 +50,6 @@ void CountingBloomFilter::incrementNibble(size_t index) {
     else {
         msNibble = (filter.at(pos) & MS_NIBBLE_MASK) >> 4;
         if (msNibble == 15) {
-            std::cerr << "Counter overflow by couting bloom filter"
-                      << std::endl;
             return;
         }
         lsNibble = filter.at(pos) & LS_NIBBLE_MASK;
@@ -70,8 +66,6 @@ void CountingBloomFilter::decrementNibble(size_t index) {
     if ((index & 1) == 0) {
         lsNibble = filter.at(pos) & LS_NIBBLE_MASK;
         if (lsNibble == 0) {
-            std::cerr << "Counter underflow by couting bloom filter"
-                      << std::endl;
             return;
         }
         msNibble = filter.at(pos) & MS_NIBBLE_MASK;
@@ -81,8 +75,6 @@ void CountingBloomFilter::decrementNibble(size_t index) {
     else {
         msNibble = (filter.at(pos) & MS_NIBBLE_MASK) >> 4;
         if (msNibble == 0) {
-            std::cerr << "Counter underflow by couting bloom filter"
-                      << std::endl;
             return;
         }
         lsNibble = filter.at(pos) & LS_NIBBLE_MASK;
