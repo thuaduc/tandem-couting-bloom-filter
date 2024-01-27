@@ -1,17 +1,15 @@
 #include "tbf.hpp"
 
-// m has to be even since every counter should have an adjecent counter
-TandemBloomFilter::TandemBloomFilter(size_t m, uint8_t k, uint8_t L_set)
-    : m{((m & 1) == 0 ? m : m + 1)},
-      k{k},
-      filter(this->m),
+// m has to be multiple of 16 since every counter should have an adjecent counter
+TandemBloomFilter::TandemBloomFilter(size_t m, uint8_t k, uint8_t L_set):
       f_set{setOfMurmurHash64A(k)},
       g_set{setOfMurmurHash64A(k)},
       h_set{setOfMurmurHash64A(k)},
-      L_set{(L_set & (L_set - 1)) == 0 && (2 <= L_set && L_set <= 32) ? L_set : static_cast<uint8_t>(4)} {}
+      filter(roundUp16(m)/8),
+      L_set{isPowerOf2(L_set) && (2 <= L_set && L_set <= 32) ? L_set : static_cast<uint8_t>(4)} {}
 
 void TandemBloomFilter::insert(uint8_t* key, uint16_t keyLength) {
-    for (uint8_t i = 0; i < k; ++i) {
+    for (uint8_t i = 0; i < f_set.size(); ++i) {
         auto [pos, vgi, whi] = getTBFvalues(i, key, keyLength);
         uint8_t& c1 = filter.at(pos);
         uint8_t& c2 = filter.at(getAdjecentIndex(pos));
@@ -44,7 +42,7 @@ void TandemBloomFilter::insert(uint8_t* key, uint16_t keyLength) {
 }
 
 bool TandemBloomFilter::lookup(uint8_t* key, uint16_t keyLength) {
-    for (uint8_t i = 0; i < k; ++i) {
+    for (uint8_t i = 0; i < f_set.size(); ++i) {
         auto [pos, vgi, whi] = getTBFvalues(i, key, keyLength);
         uint8_t c1 = filter.at(pos);
         uint8_t c2 = filter.at(getAdjecentIndex(pos));
@@ -82,7 +80,7 @@ bool TandemBloomFilter::remove(uint8_t* key, uint16_t keyLength) {
         return false;
     }
 
-    for (uint8_t i = 0; i < k; ++i) {
+    for (uint8_t i = 0; i < f_set.size(); ++i) {
         auto [index, c1, c2] = getTBFvalues(i, key, keyLength);
         uint8_t& initC1 = filter.at(index);
         uint8_t& initC2 = filter.at(getAdjecentIndex(index));
@@ -106,7 +104,7 @@ size_t TandemBloomFilter::getAdjecentIndex(size_t index) {
 std::tuple<size_t, uint8_t, uint8_t> TandemBloomFilter::getTBFvalues(
     uint8_t i, uint8_t* key, uint16_t keyLength) {
     return std::make_tuple(
-        f_set.at(i)(key, keyLength) % m,
+        f_set.at(i)(key, keyLength) % f_set.size(),
         (g_set.at(i)(key, keyLength) % L_set) + L_set,     //[L-set - 2*L_set-1]
         (h_set.at(i)(key, keyLength) % (L_set - 1)) + 1);  //[1 - L_set-1]
 }
