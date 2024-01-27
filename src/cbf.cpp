@@ -2,8 +2,8 @@
 
 CountingBloomFilter::CountingBloomFilter(size_t m, uint8_t k): 
     f_set{setOfMurmurHash64A(k)},
-    filter(m),
-    slots{static_cast<uint64_t>(ceil(m / 4.f))}
+    filter(roundUp8(m) >> 3),
+    slots{roundUp4(m) >> 2}
     {}
 
 void CountingBloomFilter::insert(uint8_t *key, uint16_t keyLength) {

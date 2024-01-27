@@ -2,7 +2,7 @@
  
 BloomFilter::BloomFilter(size_t m, uint8_t k): 
     f_set{setOfMurmurHash64A(k)},
-    filter(ceil(m/8.0)),
+    filter(roundUp8(m) >> 3),
     slots{m}{}
 
 void BloomFilter::insert(uint8_t* key, uint16_t keyLength) {

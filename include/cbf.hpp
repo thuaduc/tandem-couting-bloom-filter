@@ -1,9 +1,9 @@
 #pragma once
 #include <cstdint>
 #include <vector>
-#include <cmath>
 
 #include "murmurHash.hpp"
+#include "utility.hpp"
 
 #define LS_NIBBLE_MASK 0x0f
 #define MS_NIBBLE_MASK 0xf0
