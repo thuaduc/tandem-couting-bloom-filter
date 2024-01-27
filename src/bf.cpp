@@ -1,17 +1,20 @@
 #include "bf.hpp"
  
-BloomFilter::BloomFilter(size_t m, uint8_t k) : m{m}, k{k}, filter(ceil(m/8.0)), f_set{setOfMurmurHash64A(k)}{}
+BloomFilter::BloomFilter(size_t m, uint8_t k): 
+    f_set{setOfMurmurHash64A(k)},
+    filter(ceil(m/8.0)),
+    slots{m}{}
 
 void BloomFilter::insert(uint8_t* key, uint16_t keyLength) {
-    for (uint8_t i = 0; i < k; ++i) {
-        size_t index = f_set.at(i)(key, keyLength) % m;
+    for (uint8_t i = 0; i < f_set.size(); ++i) {
+        size_t index = f_set.at(i)(key, keyLength) % slots;
         setBit(index);
     }
 }
 
 bool BloomFilter::lookup(uint8_t* key, uint16_t keyLength) {
-    for (uint8_t i = 0; i < k; ++i) {
-        size_t index = f_set.at(i)(key, keyLength) % m;
+    for (uint8_t i = 0; i < f_set.size(); ++i) {
+        size_t index = f_set.at(i)(key, keyLength) % slots;
         if (!getBit(index)) {
             return false;
         }

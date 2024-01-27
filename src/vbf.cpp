@@ -7,7 +7,7 @@ VariableCoutingBloomFilter::VariableCoutingBloomFilter(size_t m, uint8_t k,
       filter(m),
       f_set{setOfMurmurHash64A(k)},
       g_set{setOfMurmurHash64A(k)},
-      L_set{(L_set & (L_set - 1)) == 0 && (2 <= L_set && L_set <= 32) ? L_set : 4} {}
+      L_set{(L_set & (L_set - 1)) == 0 && (2 <= L_set && L_set <= 32) ? L_set : static_cast<uint8_t>(4)} {}
 
 void VariableCoutingBloomFilter::insert(uint8_t *key, uint16_t keyLength) {
     for (uint8_t i = 0; i < k; ++i) {

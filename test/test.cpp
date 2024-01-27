@@ -31,6 +31,7 @@ std::vector<uint8_t> stringToVector(const std::string& str) {
     return std::vector<uint8_t>(str.begin(), str.end());
 }
 
+
 std::vector<uint8_t> shuffleVector(std::vector<uint8_t>& input) {
     std::vector<uint8_t> shuffledVector = input;
     std::random_device rd;
