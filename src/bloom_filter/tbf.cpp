@@ -1,7 +1,7 @@
 #include "tbf.hpp"
 
 // m has to be multiple of 16 since every counter should have an adjecent counter
-TandemBloomFilter::TandemBloomFilter(size_t m, uint8_t k, uint8_t L_set):
+TandemBloomFilter::TandemBloomFilter(uint64_t m, uint8_t k, uint8_t L_set):
       f_set{setOfMurmurHash64A(k)},
       g_set{setOfMurmurHash64A(k)},
       h_set{setOfMurmurHash64A(k)},

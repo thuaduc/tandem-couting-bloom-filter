@@ -12,10 +12,6 @@ bool isPowerOf2(uint64_t x){
     return (x & (x - 1)) == 0 ;
 }
 
-uint64_t roundUp4(uint64_t x){
-    return ((x + 3) >> 2) << 2;
-}
-
 uint64_t roundUp8(uint64_t x){
     return ((x + 7) >> 3) << 3;
 }

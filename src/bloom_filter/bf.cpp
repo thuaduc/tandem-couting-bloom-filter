@@ -1,6 +1,6 @@
 #include "bf.hpp"
  
-BloomFilter::BloomFilter(size_t m, uint8_t k): 
+BloomFilter::BloomFilter(uint64_t m, uint8_t k): 
     f_set{setOfMurmurHash64A(k)},
     filter(roundUp8(m) >> 3),
     slots{roundUp8(m)}{}

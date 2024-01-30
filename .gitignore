@@ -1,10 +1,10 @@
 .vscode
 .idea
 test/doctest
-*.out
+**.out
 src/build
-*.o
-*.a
+**.o
+**.a
 src/test
 test/doctest
 test/test.dSYM

@@ -1,6 +1,6 @@
 #include "vbf.hpp"
 
-VariableCoutingBloomFilter::VariableCoutingBloomFilter(size_t m, uint8_t k,
+VariableCoutingBloomFilter::VariableCoutingBloomFilter(uint64_t m, uint8_t k,
                                                        uint8_t L_set): 
       f_set{setOfMurmurHash64A(k)},
       g_set{setOfMurmurHash64A(k)},

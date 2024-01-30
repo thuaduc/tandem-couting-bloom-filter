@@ -7,7 +7,7 @@
 
 class BloomFilter {
    public:
-    BloomFilter(size_t m, uint8_t k);
+    BloomFilter(uint64_t m, uint8_t k);
     void insert(uint8_t *key, uint16_t keyLength);
     bool lookup(uint8_t *key, uint16_t keyLength);
 
