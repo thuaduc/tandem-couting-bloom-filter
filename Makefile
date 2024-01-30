@@ -4,15 +4,23 @@ SRCDIR = src/
 OBJDIR = obj/
 BINDIR = bin/
 
-OBJS = $(wildcard $(OBJDIR)*.o)
+OBJS_ALL = $(wildcard $(OBJDIR)*.o)
+OBJS_BLOOM = $(addprefix $(OBJDIR), bf.o cbf.o tbf.o vbf.o utility_bloom.o murmurHash.o)
 
-all: bloom.a
+all: btree.a
 
-bloom.a: btree
-	ar rcs $(BINDIR)$@ $(OBJS)
+btree.a: btree
+	ar rcs $(BINDIR)$@ $(OBJS_ALL)
 
 btree:
 	$(MAKE) -C $(SRCDIR)btree
+
+bloom.a: bloom
+	ar rcs $(BINDIR)$@ $(OBJS_BLOOM)
+
+bloom:
+	$(MAKE) -C $(SRCDIR)bloom_filter
+
 
 clean:
 	rm -rf $(OBJDIR)* $(BINDIR)*

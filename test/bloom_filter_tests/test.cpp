@@ -12,10 +12,10 @@
 #include <string>
 #include <type_traits>
 #include <vector>
+#include <doctest/doctest.h>
 
 #include "bf.hpp"
 #include "cbf.hpp"
-#include "doctest/doctest/doctest.h"
 #include "tbf.hpp"
 #include "vbf.hpp"
 
