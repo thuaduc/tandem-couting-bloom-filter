@@ -9,6 +9,14 @@ BINDIR = $(ROOT)bin/
 
 BLOOM_INCDIR = $(addprefix -I, $(INCDIR)bloom_filter $(SRCDIR)bloom_filter)
 
+ifndef DOCTEST_ABS_DIR
+    DOCTEST_ABS_DIR = ../doctest #Default Path for Doctest
+endif
+
+ifndef PERFEVENT_ABS_DIR
+    PERFEVENT_ABS_DIR = ../ #Default Path for Perfevent
+endif 
+
 all: test
 
 test: bloom.a test.o
