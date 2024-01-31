@@ -36,16 +36,14 @@ bool VariableCoutingBloomFilter::remove(uint8_t *key, uint16_t keyLength) {
 }
 
 void VariableCoutingBloomFilter::increment(size_t index, uint8_t varIncrement) {
-    if (UINT8_MAX - varIncrement < filter.at(index)) {
-        return;
+    if (filter.at(index) <= UINT8_MAX - varIncrement) {
+        filter.at(index) += varIncrement;
     }
-    filter.at(index) += varIncrement;
 }
 void VariableCoutingBloomFilter::decrement(size_t index, uint8_t varIncrement) {
-    if (filter.at(index) < varIncrement) {
-        return;
+    if (varIncrement <= filter.at(index)) {
+        filter.at(index) -= varIncrement;
     }
-    filter.at(index) -= varIncrement;
 }
 
 std::pair<size_t, uint8_t> VariableCoutingBloomFilter::getVBFvalues(
