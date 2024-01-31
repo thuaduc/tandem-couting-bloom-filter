@@ -49,7 +49,7 @@ void VariableCoutingBloomFilter::decrement(size_t index, uint8_t varIncrement) {
 std::pair<size_t, uint8_t> VariableCoutingBloomFilter::getVBFvalues(
     size_t i, uint8_t *key, uint16_t keyLength) {
     return std::make_pair(
-        f_set.at(i)(key, keyLength) % f_set.size(),
+        f_set.at(i)(key, keyLength) % filter.size(),
         (g_set.at(i)(key, keyLength) % L_set) + L_set  //[L-set - 2*L_set-1]
     );
 }

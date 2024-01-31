@@ -46,7 +46,6 @@ bool TandemBloomFilter::lookup(uint8_t* key, uint16_t keyLength) {
         auto [pos, vgi, whi] = getTBFvalues(i, key, keyLength);
         uint8_t c1 = filter.at(pos);
         uint8_t c2 = filter.at(getAdjecentIndex(pos));
-
         if ((c1 < vgi) || ((1 <= (c1 - vgi)) && ((c1 - vgi) < L_set))) {
             return false;
         }
@@ -104,7 +103,7 @@ size_t TandemBloomFilter::getAdjecentIndex(size_t index) {
 std::tuple<size_t, uint8_t, uint8_t> TandemBloomFilter::getTBFvalues(
     uint8_t i, uint8_t* key, uint16_t keyLength) {
     return std::make_tuple(
-        f_set.at(i)(key, keyLength) % f_set.size(),
+        f_set.at(i)(key, keyLength) % filter.size(),
         (g_set.at(i)(key, keyLength) % L_set) + L_set,     //[L-set - 2*L_set-1]
         (h_set.at(i)(key, keyLength) % (L_set - 1)) + 1);  //[1 - L_set-1]
 }
