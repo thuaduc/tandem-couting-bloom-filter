@@ -61,3 +61,4 @@ std::vector<uint8_t> concatenateWord(std::vector<uint8_t> prefix, std::span<uint
     prefix.insert(prefix.end(), suffix.begin(), suffix.end());
     return prefix;
 }
+

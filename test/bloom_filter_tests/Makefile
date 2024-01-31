@@ -17,15 +17,15 @@ ifndef PERFEVENT_ABS_DIR
     PERFEVENT_ABS_DIR = ../ #Default Path for Perfevent
 endif 
 
-all: test
+all: test_bloom
 
-test: bloom.a test.o
-	$(CXX) $(CFLAGS) $(OBJDIR)test.o -o $(BINDIR)test_bloom $(BINDIR)bloom.a
+test_bloom: test_bloom.o bloom.a
+	$(CXX) $(CFLAGS) $(OBJDIR)$< -o $(BINDIR)$@ $(BINDIR)bloom.a
 
 bloom.a:
 	$(MAKE) -C $(ROOT) bloom.a
 
-test.o: test.cpp
+test_bloom.o: test.cpp
 	$(CXX) $(CFLAGS) -c $< -o $(OBJDIR)$@ -I$(DOCTEST_ABS_DIR) -I$(PERFEVENT_ABS_DIR) $(BLOOM_INCDIR)
 
 clean:

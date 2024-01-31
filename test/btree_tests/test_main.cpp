@@ -1,5 +1,5 @@
 #include "tester.hpp"
-//#include "PerfEvent.hpp"
+#include "PerfEvent.hpp"
 #include <algorithm>
 #include <csignal>
 #include <fstream>
@@ -8,21 +8,21 @@
 
 using namespace std;
 
-void runTest(vector<vector<uint8_t>> &keys) {
-    // std::random_shuffle(keys.begin(), keys.end());
+void runTest(vector<vector<uint8_t>> &keys,PerfEvent& perf) {
+    std::random_shuffle(keys.begin(), keys.end());
     Tester t{};
 
-     std::vector<uint8_t> emptyKey{};
-     uint64_t count = keys.size();
+    std::vector<uint8_t> emptyKey{};
+    uint64_t count = keys.size();
 
     {
-        //PerfEventBlock peb(perf,count,{"insert"});
+        PerfEventBlock peb(perf,count,{"insert"});
         for (uint64_t i = 0; i < count; ++i) {
             t.insert(keys[i], keys[i]);
         }
     }
     {
-        //PerfEventBlock peb(perf,count/5,{"scan"});
+        PerfEventBlock peb(perf,count/5,{"scan"});
         for (uint64_t i = 0; i < count; i += 5) {
             unsigned limit = 10;
             t.scan(keys[i], [&](uint16_t, uint8_t *, uint16_t) {
@@ -32,13 +32,13 @@ void runTest(vector<vector<uint8_t>> &keys) {
         }
     }
     {
-        //PerfEventBlock peb(perf,count,{"lookup"});
+        PerfEventBlock peb(perf,count,{"lookup"});
         for (uint64_t i = 0; i < count; ++i) {
             t.lookup(keys[i]);
         }
     }
     {
-        //PerfEventBlock peb(perf,count,{"remove"});
+        PerfEventBlock peb(perf,count,{"remove"});
         for (uint64_t i = 0; i < count; ++i) {
             t.remove(keys[i]);
         }
@@ -51,7 +51,7 @@ std::vector<uint8_t> stringToVector(const std::string &str) {
 
 int main() {
     srand(42);
-    //PerfEvent perf;
+    PerfEvent perf;
     if (getenv("INT")) {
         vector<vector<uint8_t>> data;
         vector<uint64_t> v;
@@ -66,7 +66,7 @@ int main() {
             u.x = x;
             data.emplace_back(u.bytes, u.bytes + 4);
         }
-        runTest(data);
+        runTest(data,perf);
     }
 
     if (getenv("LONG1")) {
@@ -78,7 +78,7 @@ int main() {
                 s.push_back('A');
             data.push_back(stringToVector(s));;
         }
-        runTest(data);
+        runTest(data,perf);
     }
 
     if (getenv("LONG2")) {
@@ -90,7 +90,7 @@ int main() {
                 s.push_back('A' + random() % 60);
             data.push_back(stringToVector(s));
         }
-        runTest(data);
+        runTest(data,perf);
     }
 
     if (getenv("FILE")) {
@@ -100,7 +100,7 @@ int main() {
         while (getline(in, line)){
             data.push_back(stringToVector(line));
         }
-        runTest(data);
+        runTest(data,perf);
     }
 
     return 0;

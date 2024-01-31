@@ -7,9 +7,9 @@
 #include <vector>
 #include <span>
 #include <stdio.h>
+
 #include "slotted_page.hpp"
 #include "utility.hpp"
-
 
 struct BTreeNode;
 
@@ -20,6 +20,7 @@ struct BTree
 };
 
 typedef std::pair<BTreeNode*, int> parent;
+
 
 // create a new tree and return a pointer to it
 BTree *btree_create();
@@ -69,4 +70,3 @@ void btree_scan(BTree *tree, uint8_t *key, unsigned keyLength, uint8_t *keyOut,
                     &found_callback);
                     
 void btree_scan_helper(BTreeNode* node, uint8_t *key, unsigned keyLength, uint8_t *keyOut, const std::function<bool(unsigned int, uint8_t *, unsigned int)> &found_callback);
-

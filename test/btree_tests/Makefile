@@ -1,13 +1,30 @@
-all:main
+CXX = clang++ -std=c++20
+CFLAGS = -Wall -Wextra
 
-btree.a: .FORCE
-	$(MAKE) -C src/btree
+ROOT = ../../
+SRCDIR = $(ROOT)src/
+INCDIR = $(ROOT)include/
+OBJDIR = $(ROOT)obj/
+BINDIR = $(ROOT)bin/
 
-main: test_main.cpp btree.a tester.hpp
-	clang++ -std=c++20 -o $@ -Wall -Wextra $< bin/btree.a -I include -I src/btree -I include/btree
+BETREE_INCDIR = $(addprefix -I, $(INCDIR)btree $(SRCDIR)btree)
 
-format:
-	find . -type f -name '*.?pp' -exec clang-format -i {} \;
+ifndef PERFEVENT_ABS_DIR
+    PERFEVENT_ABS_DIR = ../ #Default Path for Perfevent
+endif 
 
-.PHONY: .FORCE format
-.FORCE:
+all: test_btree
+
+test_btree: test_btree.o btree.a tester.hpp
+	$(CXX) $(CFLAGS) $(OBJDIR)$< -o $(BINDIR)$@ $(BINDIR)btree.a
+
+btree.a:
+	$(MAKE) -C $(ROOT) btree.a
+
+test_btree.o: test_main.cpp
+	$(CXX) $(CFLAGS) -c $^ -o $(OBJDIR)$@ -O2 -I$(PERFEVENT_ABS_DIR) $(BETREE_INCDIR)
+
+clean:
+	rm -f $(OBJDIR)* $(BINDIR)*
+
+

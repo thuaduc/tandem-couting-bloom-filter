@@ -11,3 +11,4 @@ test/test.dSYM
 bin/urls
 *.tmp
 bin/test
+/bin

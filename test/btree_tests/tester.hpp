@@ -1,7 +1,7 @@
 #ifndef DSE_PRACTICAL_COURSE_BTREE_TEMPLATE_TESTER_HPP
 #define DSE_PRACTICAL_COURSE_BTREE_TEMPLATE_TESTER_HPP
 
-#include "btree/btree.hpp"
+#include "btree.hpp"
 #include <cassert>
 #include <cstring>
 #include <map>
