@@ -66,7 +66,7 @@ void printBenchmark(double insertTime, double lookupTime, double removeTime,
     }
 
     if (falsePositiveRate != 0) {
-        std::cout << "False positive rate: " << falsePositiveRate << std::endl;
+        std::cout << "False positive rate: " << falsePositiveRate << "%"<< std::endl;
     }
 }
 
