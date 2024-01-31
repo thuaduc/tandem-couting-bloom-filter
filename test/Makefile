@@ -8,7 +8,10 @@ BINDIR = $(ROOT)bin/
 DOCTEST_DIR = doctest/ #Path to doctest
 PERFEVENT_DIR = ./ #Path to Pervevent
 
-export DOCTEST_DIR PERFEVENT_DIR  
+DOCTEST_ABS_DIR = $(abspath $(DOCTEST_DIR))
+PERFEVENT_ABS_DIR = $(abspath $(PERFEVENT_DIR))
+
+export DOCTEST_ABS_DIR PERFEVENT_ABS_DIR  
 
 all: test_bloom
 

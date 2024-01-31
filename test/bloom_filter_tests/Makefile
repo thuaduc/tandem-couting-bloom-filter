@@ -12,13 +12,13 @@ BLOOM_INCDIR = $(addprefix -I, $(INCDIR)bloom_filter $(SRCDIR)bloom_filter)
 all: test
 
 test: bloom.a test.o
-	$(CXX) $(CFLAGS) $(OBJDIR)test.o -o $(BINDIR)test_bloom $(BINDIR)bloom.a -I$(DOCTEST_DIR) -I$(PERFEVENT_DIR)
+	$(CXX) $(CFLAGS) $(OBJDIR)test.o -o $(BINDIR)test_bloom $(BINDIR)bloom.a
 
 bloom.a:
 	$(MAKE) -C $(ROOT) bloom.a
 
 test.o: test.cpp
-	$(CXX) $(CFLAGS) -c $< -o $(OBJDIR)$@ -I../$(DOCTEST_DIR) -I../$(PERFEVENT_DIR) $(BLOOM_INCDIR)
+	$(CXX) $(CFLAGS) -c $< -o $(OBJDIR)$@ -I$(DOCTEST_ABS_DIR) -I$(PERFEVENT_ABS_DIR) $(BLOOM_INCDIR)
 
 clean:
 	rm -f $(OBJDIR)* $(BINDIR)*
