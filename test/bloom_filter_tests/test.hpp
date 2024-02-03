@@ -13,14 +13,14 @@
 
 #include "bf.hpp"
 
-size_t lookup_range = 10000;
+size_t lookup_range = 100000;
 size_t in_set_high = 10000;
 size_t out_set_low = 15000;
 size_t urls_length = 6391377;
 size_t filter_length_bits = 32768;
-uint8_t k_hash_functions = 4;
-uint8_t l_set = 8;
-size_t repetitions = 5;
+uint8_t k_hash_functions = 5;
+uint8_t l_set = 4;
+size_t repetitions = 10;
 
 std::array<int, 6> elementsInSet = {820, 683, 586, 512, 456, 410};
 std::array<size_t, 6> bitsPerElement_TBF = {40, 48, 56, 64, 72, 80};
@@ -53,17 +53,6 @@ void printBenchmark(double insertTime, double lookupTime, double removeTime) {
     if (removeTime != 0) {
         std::cout << "Remove time: " << removeTime << " (Miliseconds)"
                   << std::endl;
-    }
-}
-
-template <typename T>
-void runTestTrueNegative(T &bf, const std::vector<std::vector<uint8_t>> &data) {
-    for (auto line : data) {
-        bf.insert(line.data(), line.size());
-    }
-
-    for (auto line : data) {
-        CHECK_EQ(bf.lookup(line.data(), line.size()), true);
     }
 }
 
@@ -131,6 +120,10 @@ double FPR_Removal(T &bf, std::vector<std::vector<uint8_t>> &data,
     //      ++i) {
     //     bf.insert(data.at(i).data(), data.at(i).size());
     //     bf.remove(data.at(i).data(), data.at(i).size());
+    // }
+
+    // for (size_t i = out_set_low_bound; i < out_set_low_bound + lookup_range;
+    //      ++i) {
     // }
 
     for (size_t i = out_set_low_bound; i < out_set_low_bound + lookup_range;
