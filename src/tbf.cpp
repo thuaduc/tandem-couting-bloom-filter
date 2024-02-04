@@ -12,7 +12,7 @@ void TandemBloomFilter::insert(uint8_t* key, uint16_t keyLength) {
     for (uint8_t i = 0; i < f_set.size(); ++i) {
         auto [pos, vgi, whi] = getTBFvalues(i, key, keyLength);
         uint8_t& c1 = filter.at(pos);
-        uint8_t& c2 = filter.at(getAdjecentIndex(pos));
+        uint8_t& c2 = filter.at(getAdjacentIndex(pos));
 
         if (c1 < L_set) {
             c1 = vgi;
@@ -45,7 +45,7 @@ bool TandemBloomFilter::lookup(uint8_t* key, uint16_t keyLength) {
     for (uint8_t i = 0; i < f_set.size(); ++i) {
         auto [pos, vgi, whi] = getTBFvalues(i, key, keyLength);
         uint8_t c1 = filter.at(pos);
-        uint8_t c2 = filter.at(getAdjecentIndex(pos));
+        uint8_t c2 = filter.at(getAdjacentIndex(pos));
         if ((c1 < vgi) || ((1 <= (c1 - vgi)) && ((c1 - vgi) < L_set))) {
             return false;
         }
@@ -82,7 +82,7 @@ bool TandemBloomFilter::remove(uint8_t* key, uint16_t keyLength) {
     for (uint8_t i = 0; i < f_set.size(); ++i) {
         auto [index, c1, c2] = getTBFvalues(i, key, keyLength);
         uint8_t& initC1 = filter.at(index);
-        uint8_t& initC2 = filter.at(getAdjecentIndex(index));
+        uint8_t& initC2 = filter.at(getAdjacentIndex(index));
         if (L_set <= initC1 && initC1 < 2 * L_set) {
             initC1 = 0;
         } else {
@@ -96,7 +96,7 @@ bool TandemBloomFilter::remove(uint8_t* key, uint16_t keyLength) {
     return true;
 }
 
-size_t TandemBloomFilter::getAdjecentIndex(size_t index) {
+size_t TandemBloomFilter::getAdjacentIndex(size_t index) {
     return (index & 1) == 0 ? index + 1 : index - 1;
 }
 

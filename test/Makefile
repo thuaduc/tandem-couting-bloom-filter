@@ -1,25 +1,33 @@
 CXX = clang++ -std=c++20
+CFLAGS = -Wall -Wextra -O3
+DEPFLAGS = -MP -MD
 
 ROOT = ../
 SRCDIR = $(ROOT)src/
+INCDIR = $(ROOT)include/
 OBJDIR = $(ROOT)obj/
 BINDIR = $(ROOT)bin/
 
 DOCTEST_DIR = doctest/ #Path to doctest
 PERFEVENT_DIR = ./ #Path to Pervevent
 
-DOCTEST_ABS_DIR = $(abspath $(DOCTEST_DIR))
-PERFEVENT_ABS_DIR = $(abspath $(PERFEVENT_DIR))
+INCLUDE_FLAGS = $(addprefix -I, $(INCDIR) $(SRCDIR) $(DOCTEST_DIR) $(PERFEVENT_DIR))
+DEPS = $(addprefix $(OBJDIR), test.d)
+-include $(DEPS)
 
-export DOCTEST_ABS_DIR PERFEVENT_ABS_DIR  
 
-all: test_bloom
+.PHONY: all clean
 
-test_bloom:
-	$(MAKE) -C bloom_filter_tests/
+all: $(BINDIR)test
 
-test_btree:
-	$(MAKE) -C btree_tests/
-	
+$(BINDIR)test: $(OBJDIR)test.o $(BINDIR)bloom.a
+	$(CXX) $(CFLAGS) $< -o $@ $(BINDIR)bloom.a
+
+$(BINDIR)bloom.a:
+	$(MAKE) -C $(ROOT)
+
+$(OBJDIR)test.o: test.cpp
+	$(CXX) $(CFLAGS) $(DEPFLAGS) -c $< -o $@ $(INCLUDE_FLAGS)
+
 clean:
-	rm -rf $(OBJDIR)* $(BINDIR)*
+	rm -rf $(OBJDIR)test.o $(OBJDIR)test $(OBJDIR)test.d 

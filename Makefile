@@ -1,32 +1,28 @@
 CXX = clang++ -std=c++20
+CFLAGS = -Wall -Wextra -c -O3
 
 SRCDIR = src/
+INCDIR = include/
 OBJDIR = obj/
 BINDIR = bin/
 TESTDIR = test/
 
-OBJS_ALL = $(wildcard $(OBJDIR)*.o)
-OBJS_BLOOM = $(addprefix $(OBJDIR), bf.o cbf.o tbf.o vbf.o utility_bloom.o murmurHash.o)
+OBJS = $(addprefix $(OBJDIR), bf.o cbf.o vbf.o tbf.o murmurHash.o utility.o)
+INCLUDE_FLAGS = $(addprefix -I, $(INCDIR) $(SRCDIR))
 
-all: btree.a bloom.a btree_test bloom_test
+.PHONY: all clean test
 
-btree.a: btree
-	ar rcs $(BINDIR)$@ $(OBJS_ALL)
+all: $(BINDIR)bloom.a
 
-btree:
-	$(MAKE) -C $(SRCDIR)btree
+$(BINDIR)bloom.a: $(OBJS)
+	ar rcs $@ $^
 
-bloom.a: bloom
-	ar rcs $(BINDIR)$@ $(OBJS_BLOOM)
+$(OBJDIR)%.o: $(SRCDIR)%.cpp
+	$(CXX) $(CFLAGS) $(INCLUDE_FLAGS) $< -o $@
 
-bloom:
-	$(MAKE) -C $(SRCDIR)bloom_filter
-
-btree_test:
-	$(MAKE) -C $(TESTDIR) test_btree
-
-bloom_test:
-	$(MAKE) -C $(TESTDIR) test_bloom
+test:
+	$(MAKE) -C $(TESTDIR)
 
 clean:
 	rm -rf $(OBJDIR)* $(BINDIR)*
+

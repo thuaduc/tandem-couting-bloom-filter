@@ -22,6 +22,6 @@ class TandemBloomFilter {
     
     void increment(uint8_t& toInc, uint8_t varIncrement);
     void decrement(uint8_t& toDec, uint8_t varIncrement);
-    size_t getAdjecentIndex(size_t index);
+    size_t getAdjacentIndex(size_t index);
     std::tuple<size_t, uint8_t, uint8_t> getTBFvalues(uint8_t i, uint8_t *key, uint16_t keyLength);
 };
