@@ -1,14 +1,5 @@
 .vscode
 .idea
+bin/*
+obj/*
 test/doctest
-**.out
-src/build
-**.o
-**.a
-src/test
-test/doctest
-test/test.dSYM
-bin/urls
-*.tmp
-bin/test
-/bin
