@@ -12,33 +12,46 @@
 #include "vbf.hpp"
 
 template <typename T>
-void runTestTrueNegative(T &bf, const std::vector<std::vector<uint8_t>> &data) {
-    for (auto line : data) {
+void runTestTrueNegative(T &bf, const std::vector<std::vector<uint8_t>> &data)
+{
+    for (auto line : data)
+    {
         bf.insert(line.data(), line.size());
     }
 
-    for (auto line : data) {
+    for (auto line : data)
+    {
         CHECK_EQ(bf.lookup(line.data(), line.size()), true);
     }
 }
 
-TEST_CASE("Benchmarking false positive rate") {
+TEST_CASE("Benchmarking false positive rate")
+{
     std::vector<std::vector<uint8_t>> data;
-    // size_t counter = 0;
-    // std::string str = "";
-    // while (true) {
-    //     data.push_back(stringToVector(str));
-    //     str += counter++;
-    //     if (counter == 1000000) break;
-    // };
+    std::vector<uint64_t> v;
+    for (uint64_t i = 0; i < 10000000; ++i)
+        v.push_back(i);
+    union
+    {
+        uint32_t x;
+        uint8_t bytes[4];
+    } u;
+    for (auto x : v)
+    {
+        u.x = x;
+        data.emplace_back(u.bytes, u.bytes + 4);
+    }
 
-    SUBCASE("Case no removal Counting Bloomfilter") {
+    SUBCASE("Case no removal Counting Bloomfilter")
+    {
         std::cout << "-------------" << std::endl;
         std::cout << "CBF" << std::endl;
-        for (size_t i = 0; i < bitsPerElement.size(); ++i) {
+        for (size_t i = 0; i < bitsPerElement.size(); ++i)
+        {
             double cbf_FPR = 0;
 
-            for (size_t j = 0; j < repetitions; ++j) {
+            for (size_t j = 0; j < repetitions; ++j)
+            {
                 CountingBloomFilter cbf{filter_length_bits, k_hash_functions};
                 cbf_FPR += FPR_Removal<CountingBloomFilter>(
                     cbf, data, elementsInSet.at(i));
@@ -50,12 +63,15 @@ TEST_CASE("Benchmarking false positive rate") {
         std::cout << "-------------" << std::endl;
     }
 
-    SUBCASE("Case no removal Variable Counting Bloomfilter") {
+    SUBCASE("Case no removal Variable Counting Bloomfilter")
+    {
         std::cout << "V-CBF" << std::endl;
-        for (size_t i = 0; i < bitsPerElement.size(); ++i) {
+        for (size_t i = 0; i < bitsPerElement.size(); ++i)
+        {
             double vbf_FPR = 0;
 
-            for (size_t j = 0; j < repetitions; ++j) {
+            for (size_t j = 0; j < repetitions; ++j)
+            {
                 VariableCoutingBloomFilter vbf{filter_length_bits,
                                                k_hash_functions, l_set};
                 vbf_FPR += FPR_Removal<VariableCoutingBloomFilter>(
@@ -69,12 +85,15 @@ TEST_CASE("Benchmarking false positive rate") {
         std::cout << "-------------" << std::endl;
     }
 
-    SUBCASE("Case no removal Tandem Counting Bloomfilter") {
+    SUBCASE("Case no removal Tandem Counting Bloomfilter")
+    {
         std::cout << "TBF" << std::endl;
-        for (size_t i = 0; i < bitsPerElement.size(); ++i) {
+        for (size_t i = 0; i < bitsPerElement.size(); ++i)
+        {
             double tbf_FPR = 0;
 
-            for (size_t j = 0; j < repetitions; ++j) {
+            for (size_t j = 0; j < repetitions; ++j)
+            {
                 TandemBloomFilter tbf{filter_length_bits, k_hash_functions,
                                       l_set};
                 tbf_FPR += FPR_Removal<TandemBloomFilter>(tbf, data,
