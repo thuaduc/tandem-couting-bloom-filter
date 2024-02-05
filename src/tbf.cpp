@@ -1,12 +1,15 @@
 #include "tbf.hpp"
 
-// m has to be multiple of 16 since every counter should have an adjecent counter
-TandemBloomFilter::TandemBloomFilter(uint64_t m, uint8_t k, uint8_t L_set):
-      f_set{setOfMurmurHash64A(k)},
+// m has to be multiple of 16 since every counter should have an adjecent
+// counter
+TandemBloomFilter::TandemBloomFilter(uint64_t m, uint8_t k, uint8_t L_set)
+    : f_set{setOfMurmurHash64A(k)},
       g_set{setOfMurmurHash64A(k)},
       h_set{setOfMurmurHash64A(k)},
       filter(roundUp16(m) >> 3),
-      L_set{isPowerOf2(L_set) && (2 <= L_set && L_set <= 32) ? L_set : static_cast<uint8_t>(4)} {}
+      L_set{isPowerOf2(L_set) && (2 <= L_set && L_set <= 32)
+                ? L_set
+                : static_cast<uint8_t>(4)} {}
 
 void TandemBloomFilter::insert(uint8_t* key, uint16_t keyLength) {
     for (uint8_t i = 0; i < f_set.size(); ++i) {
@@ -74,8 +77,7 @@ bool TandemBloomFilter::lookup(uint8_t* key, uint16_t keyLength) {
 }
 
 bool TandemBloomFilter::remove(uint8_t* key, uint16_t keyLength) {
-    
-    if(!lookup(key, keyLength)){
+    if (!lookup(key, keyLength)) {
         return false;
     }
 

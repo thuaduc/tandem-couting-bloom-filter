@@ -21,7 +21,7 @@ DEPS = $(addprefix $(OBJDIR), test.d)
 all: $(BINDIR)test
 
 $(BINDIR)test: $(OBJDIR)test.o $(BINDIR)bloom.a
-	$(CXX) $(CFLAGS) $< -o $@ $(BINDIR)bloom.a
+	$(CXX) $(CFLAGS) $< -o $@ $(BINDIR)bloom.a $(INCLUDE_FLAGS)
 
 $(BINDIR)bloom.a:
 	$(MAKE) -C $(ROOT)

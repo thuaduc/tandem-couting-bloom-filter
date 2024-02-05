@@ -11,20 +11,16 @@
 #include <type_traits>
 #include <vector>
 
-#include "bf.hpp"
+#include "../include/bf.hpp"
 
 size_t lookup_range = 100000;
-size_t in_set_high = 10000;
-size_t out_set_low = 15000;
-size_t urls_length = 6391377;
-size_t filter_length_bits = 32768;
-uint8_t k_hash_functions = 5;
-uint8_t l_set = 4;
-size_t repetitions = 10;
+size_t filter_length_bits = 16384;
+uint8_t k_hash_functions = 4;
+uint8_t l_set = 6;
+size_t repetitions = 1;
 
-std::array<int, 6> elementsInSet = {820, 683, 586, 512, 456, 410};
-std::array<size_t, 6> bitsPerElement_TBF = {40, 48, 56, 64, 72, 80};
-std::array<size_t, 6> bitsPerElement_CBF = {80, 96, 112, 128, 144, 160};
+std::array<int, 6> elementsInSet = {410, 341, 292, 256, 228, 205};
+std::array<size_t, 6> bitsPerElement = {40, 48, 56, 64, 72, 80};
 
 double currentTime() {
     auto now = std::chrono::high_resolution_clock::now();
@@ -105,32 +101,46 @@ std::pair<double, double> runTestSameMemory_BF(
 }
 
 template <typename T>
-double FPR_Removal(T &bf, std::vector<std::vector<uint8_t>> &data,
+double FPR_Removal(T &bf, std::vector<std::vector<uint8_t>> &dataaa,
                    size_t elesInSet) {
     double falsePositiveRate = 0;
-    auto in_set_low_bound = randomNumberGenerator(0, in_set_high);
-    auto out_set_low_bound =
-        randomNumberGenerator(out_set_low, urls_length - lookup_range);
 
-    for (size_t i = in_set_low_bound; i < in_set_low_bound + elesInSet; ++i) {
-        bf.insert(data.at(i).data(), data.at(i).size());
+    size_t c = 0;
+    std::string str = "";
+    str += c;
+
+    for (size_t i = 0; i < elesInSet; ++i) {
+        auto data = stringToVector(str);
+        bf.insert(data.data(), data.size());
+        str += c++;
     }
 
-    // for (size_t i = out_set_low_bound; i < out_set_low_bound + lookup_range;
-    //      ++i) {
+    for (size_t i = elesInSet; i < elesInSet * 2; ++i) {
+        auto data = stringToVector(str);
+        bf.insert(data.data(), data.size());
+        bf.remove(data.data(), data.size());
+        str += c++;
+    }
+
+    //  for (size_t i = elesInSet; i < elesInSet * 2; ++i) {
     //     bf.insert(data.at(i).data(), data.at(i).size());
+    // }
+
+    //  for (size_t i = elesInSet; i < elesInSet * 2; ++i) {
     //     bf.remove(data.at(i).data(), data.at(i).size());
     // }
 
-    // for (size_t i = out_set_low_bound; i < out_set_low_bound + lookup_range;
-    //      ++i) {
-    // }
-
-    for (size_t i = out_set_low_bound; i < out_set_low_bound + lookup_range;
-         ++i) {
-        if (bf.lookup(data.at(i).data(), data.at(i).size())) {
+    size_t counter = elesInSet;
+    while (true) {
+        ++counter;
+        auto data = stringToVector(str);
+        str += c++;
+        if (bf.lookup(data.data(), data.size())) {
             ++falsePositiveRate;
+
+            if (falsePositiveRate == 10000) {
+                return (100.0 * falsePositiveRate) / (counter - elesInSet);
+            }
         }
     }
-    return (100.0 * falsePositiveRate) / lookup_range;
 }
