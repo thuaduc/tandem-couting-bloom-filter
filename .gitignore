@@ -4,3 +4,4 @@ bin/*
 obj/*
 test/doctest
 **/.DS_Store
+data/urls
