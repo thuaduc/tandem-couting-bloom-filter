@@ -7,12 +7,13 @@ uint64_t randomSeed64()
     return distribution(rng);
 }
 
-
-bool isPowerOf2(uint64_t x){
-    return (x & (x - 1)) == 0 ;
+bool isPowerOf2(uint64_t x)
+{
+    return (x & (x - 1)) == 0;
 }
 
-uint64_t roundUp8(uint64_t x){
+uint64_t roundUp8(uint64_t x)
+{
     return ((x + 7) >> 3) << 3;
 }
 
