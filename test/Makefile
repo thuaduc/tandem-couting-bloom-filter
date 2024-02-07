@@ -9,9 +9,8 @@ OBJDIR = $(ROOT)obj/
 BINDIR = $(ROOT)bin/
 
 DOCTEST_DIR = doctest/ #Path to doctest
-PERFEVENT_DIR = ./ #Path to Pervevent
 
-INCLUDE_FLAGS = $(addprefix -I, $(INCDIR) $(SRCDIR) $(DOCTEST_DIR) $(PERFEVENT_DIR))
+INCLUDE_FLAGS = $(addprefix -I, $(INCDIR) $(SRCDIR) $(DOCTEST_DIR))
 DEPS = $(addprefix $(OBJDIR), test.d)
 -include $(DEPS)
 
